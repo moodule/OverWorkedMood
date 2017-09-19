@@ -11,6 +11,7 @@ The project can be accessed directly through a [web app](), without any installa
 # Process
 - [ ] read image
 - [ ] convert to grayscales
+- [ ] filter out small objects
 - [ ] somehow filter / classify between b&w, the output image must be binary
 - [ ] intermediate grays could be interpreted as the slope of the folded pattern 
 - [ ] locate the boundaries, in pixels
