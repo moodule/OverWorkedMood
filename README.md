@@ -1,14 +1,14 @@
 The **OverWorked** moodule lets you generate patterns of book folding.
 These can then be used to create a 3d shape close to a sculpture by folding the pages.
 
-#Installation
+# Installation
 
-#Quick Start
+# Quick Start
 
-#Resources
+# Resources
 The project can be accessed directly through a [web app](), without any installation.
 
-#Process
+# Process
 [ ] read image
 [ ] convert to grayscales
 [ ] somehow filter / classify between b&w, the output image must be binary
