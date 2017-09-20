@@ -9,10 +9,10 @@ These can then be used to create a 3d shape close to a sculpture by folding the 
 The project can be accessed directly through a [web app](), without any installation.
 
 # Process
-- [ ] read image
-- [ ] convert to grayscales
+- [x] read image
+- [x] convert to grayscales
 - [ ] filter out small objects
-- [ ] somehow filter / classify between b&w, the output image must be binary
+- [x] somehow filter / classify between b&w, the output image must be binary
 - [ ] intermediate grays could be interpreted as the slope of the folded pattern 
 - [ ] locate the boundaries, in pixels
 - [ ] infer the pattern dimensions in pixels
