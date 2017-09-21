@@ -41,15 +41,25 @@ class Pattern(object):
         self._image = self._image.point(lambda x: 0 if x<85 else 255, '1')
 
     def _crop(self):
-        x_array = np.array(self._image)
-        x_array = np.sum(x_array, axis=1)
-        x_array = np.nonzero(x_array)[0]
-
-        y_array = np.array(self._image)
-        y_array = np.sum(y_array, axis=0)
-        y_array = np.nonzero(y_array)[0]
+        temp = np.invert(np.array(self._image))
+        is_image_empty = np.sum(temp)
         
-        #self._image.crop((min_x, max_y, max_x, min_y))
+        if is_image_empty > 0.0:
+            x_array = np.sum(temp, axis=1)
+            x_array = np.transpose(np.nonzero(x_array))
+
+            y_array = np.sum(temp, axis=0)
+            y_array = np.transpose(np.nonzero(y_array))
+
+            min_x = x_array[0]
+            max_x = x_array[::-1][0]
+
+            min_y = y_array[0]
+            max_y = y_array[::-1][0]
+        else:
+            raise Exception('The provided image is empty !')
+        
+        self._image.crop((min_x, min_y, max_x, max_y)).show()
 
     def _smooth_pattern(self):
         pass
