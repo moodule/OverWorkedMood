@@ -2,13 +2,14 @@ import numpy as np
 from PIL import Image
 
 # TODO normaliser / augmenter le contraste : plutot que d'avoir un critere absolu b&w
-# TODO even the sheet spacing : if a 
+# TODO even the sheet spacing
 
 class Pattern(object):
 
     def __init__(self, image):
         self._image = image
         self._image.load()
+        self._slices = np.array
         self._update_attributes()
 
     def __str__(self):
@@ -25,29 +26,66 @@ class Pattern(object):
     def preprocess(self):
         self._fill_background()
         self._transform_black_white()
-        self._image.show()
-        self._emphasize()
-        self._image.show()
+        self._emphasize_image()
         self._transform_binary()
-        self._image.show()
-        self._crop()
+        self._crop_image()
+        self._smooth_image()
         self._update_attributes()
 
+    def slice_image(self):
+        self._slices = np.empty((self.width,),dtype=object)
+        temp = np.array(self._image).transpose()
+        for x in xrange(self.width):
+            self._slices[x] = []
+            previous_color = True   # white
+            current_color = True    # white, the picture is encoded in binary
+            current_start = -1
+            current_end = -1
+            for y in xrange(self.height):
+                current_color = temp[x,y]
+                if current_color != previous_color:
+                    if current_color:
+                        current_end = y - 1     # can't happen at y=0
+                        self._slices[x].append((current_start, current_end))
+                        current_start = -1
+                        current_end = -1
+                    else:
+                        current_start = y
+                if y >= (self.height - 1):
+                    if current_color == False:
+                        self._slices[x].append((current_start, self.height - 1))
+                previous_color = current_color
+
     def postprocess(self):
-        self._smooth_pattern()
+        self._isolate_bands()
+        self._filter_bands()
         self._update_attributes()
+
+    def show(self, sheet_width=1):
+        pattern_width = 2 * sheet_width * len(self._bands)
+        pattern_data = np.ones((pattern_width, self.height), dtype=bool)
+        for i, band in enumerate(self._bands):
+            pattern_data[(2*i*sheet_width):((2*i+1)*sheet_width),:] = False #self._band_to_pixel_columns(band, sheet_width)
+        #pattern_data = pattern_data.transpose()
+        pattern_image = Image.fromarray(pattern_data, mode='1')
+        pattern_image.show()
+        print pattern_data.shape
+        print len(self._bands)
 
     def _update_attributes(self):
         self.width = self._image.width
         self.height = self._image.height
+        temp = np.array(self._image)
 
     def _fill_background(self):
         if self._image.mode == 'RGBA':
             self._image.load()
-            white_bg_image = Image.new('RGBA', self._image.size, (255,255,255))
-            self._image = white_bg_image.paste(self._image, mask=self._image.split()[3])
+            temp = np.array(self._image)
+            mask = (temp[:,:,3] == 0)
+            temp[:,:,:4][mask] = [255, 255, 255, 255]
+            self._image = Image.fromarray(temp)
 
-    def _emphasize(self):
+    def _emphasize_image(self):
         temp = np.array(self._image)
         min_level = np.amin(temp)
         max_level = np.amax(temp[temp < 255])
@@ -60,7 +98,7 @@ class Pattern(object):
     def _transform_binary(self):
         self._image = self._image.point(lambda x: 0 if x<85 else 255, '1')
 
-    def _crop(self):
+    def _crop_image(self):
         temp = np.invert(np.array(self._image))
         is_image_empty = np.sum(temp)
         is_image_empty = is_image_empty == 0.0
@@ -82,8 +120,26 @@ class Pattern(object):
         
         self._image = self._image.crop((min_y, min_x, max_y, max_x))
 
-    def _smooth_pattern(self):
+    def _smooth_image(self):
         pass
+
+    def _filter_bands(self):
+        for raw_slice in self._slices:
+            new_slice = []
+            for band in raw_slice:
+                if (band[1]-band[0]) > (self.height // 25):
+                    new_slice.append(band)
+            raw_slice = new_slice
 
     def _even_slice_spacing(self):
         pass
+
+    def _isolate_bands(self, step=1):
+        self._bands = []
+        for s in self._slices[::step]:
+            self._bands += s
+
+    def _band_to_pixel_columns(self, band, sheet_width=1):
+        columns = np.ones((sheet_width,self.height), dtype=bool)
+        columns[:,band[0]:band[1]] = False
+        return columns
