@@ -1,7 +1,7 @@
 import pattern
 from PIL import Image
 
-test_image = Image.open('images/tensorflow.jpg')
+test_image = Image.open('images/exemples/github.png')
 
 pattern = pattern.Pattern(test_image)
 pattern.preprocess()

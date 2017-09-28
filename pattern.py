@@ -62,15 +62,12 @@ class Pattern(object):
         self._update_attributes()
 
     def show(self, sheet_width=1):
-        pattern_width = 2 * sheet_width * len(self._bands)
-        pattern_data = np.ones((pattern_width, self.height), dtype=bool)
-        for i, band in enumerate(self._bands):
-            pattern_data[(2*i*sheet_width):((2*i+1)*sheet_width),:] = False #self._band_to_pixel_columns(band, sheet_width)
-        #pattern_data = pattern_data.transpose()
-        pattern_image = Image.fromarray(pattern_data, mode='1')
-        pattern_image.show()
-        print pattern_data.shape
-        print len(self._bands)
+        band_count = len(self._bands)
+        pattern_image_width = 3 * sheet_width * band_count
+        self._pattern_image = Image.new('1', (pattern_image_width, self.height), True)
+        for i in xrange(band_count):
+            self._fill_image_band(i, sheet_width)
+        self._pattern_image.show()
 
     def _update_attributes(self):
         self.width = self._image.width
@@ -139,7 +136,8 @@ class Pattern(object):
         for s in self._slices[::step]:
             self._bands += s
 
-    def _band_to_pixel_columns(self, band, sheet_width=1):
-        columns = np.ones((sheet_width,self.height), dtype=bool)
-        columns[:,band[0]:band[1]] = False
-        return columns
+    def _fill_image_band(self, band_index, sheet_width=1):
+        band = self._bands[band_index]
+        for x in range(3 * band_index * sheet_width, (1 + 3*band_index) * sheet_width):
+            for y in range(band[0], band[1]):
+                self._pattern_image.putpixel((x,y), False)
