@@ -1,15 +1,22 @@
 import numpy as np
+import os
 from PIL import Image
 
 # TODO normaliser / augmenter le contraste : plutot que d'avoir un critere absolu b&w
 # TODO even the sheet spacing
+# TODO sheet spacing modes = none, max, pgcd
+# TODO warn when the whole page must be folded
+# TODO band_count : [(s_0,e_0,b_c_0) (s_1,e_1,b_c_1) ...]
+# TODO steps : [(s_0,e_0,step_0) (s_1,e_1,step_1) ...]
+
 
 class Pattern(object):
 
-    def __init__(self, image):
-        self._image = image
-        self._image.load()
-        self._slices = np.array
+    def __init__(self, image_path):
+        self.path, self._image_extension = os.path.splitext(image_path)
+        self._image = Image.open(image_path)
+        self._slices = np.empty((image.width,), dtype=object)
+        self._bands = []
         self._update_attributes()
 
     def __str__(self):
@@ -57,22 +64,33 @@ class Pattern(object):
                 previous_color = current_color
 
     def postprocess(self):
-        self._isolate_bands()
         self._filter_bands()
+        self._isolate_bands()
+        self._generate_pattern_image()
+        self.save_image()
+        #self.save_pattern()
         self._update_attributes()
 
-    def show(self, sheet_width=1):
+    def show(self, source='pattern'):
+        if source == 'pattern':
+            self._pattern_image.show()
+        else:
+            self._image.show()
+
+    def save_image(self):
+        self._pattern_image.save(self.name
+
+    def _generate_pattern_image(self, sheet_width=1):
         band_count = len(self._bands)
         pattern_image_width = 3 * sheet_width * band_count
         self._pattern_image = Image.new('1', (pattern_image_width, self.height), True)
         for i in xrange(band_count):
             self._fill_image_band(i, sheet_width)
-        self._pattern_image.show()
 
     def _update_attributes(self):
         self.width = self._image.width
         self.height = self._image.height
-        temp = np.array(self._image)
+        self.total_band_count = len(self._bands)
 
     def _fill_background(self):
         if self._image.mode == 'RGBA':
@@ -85,7 +103,7 @@ class Pattern(object):
     def _emphasize_image(self):
         temp = np.array(self._image)
         min_level = np.amin(temp)
-        max_level = np.amax(temp[temp < 255])
+        max_level = np.amax(temp)
         if max_level > min_level:
             self._image = self._image.point(lambda x: 255. * (x - min_level) / (max_level - min_level))
 
@@ -124,7 +142,7 @@ class Pattern(object):
         for raw_slice in self._slices:
             new_slice = []
             for band in raw_slice:
-                if (band[1]-band[0]) > (self.height // 25):
+                if (band[1]-band[0]) > (self.height // 300):
                     new_slice.append(band)
             raw_slice = new_slice
 
