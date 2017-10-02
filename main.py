@@ -1,10 +1,8 @@
 import pattern
 from PIL import Image
 
-test_image = Image.open('images/exemples/bike.png')
-
-pattern = pattern.Pattern(test_image)
-pattern.preprocess()
+pattern = pattern.Pattern('images/exemples/bike.png')
+pattern.preprocess(invert=False)
 pattern.slice_image()
 pattern.postprocess()
 pattern.show()

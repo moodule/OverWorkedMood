@@ -1,21 +1,24 @@
 import numpy as np
 import os
 from PIL import Image
+from PIL import ImageOps
 
 # TODO normaliser / augmenter le contraste : plutot que d'avoir un critere absolu b&w
 # TODO even the sheet spacing
-# TODO sheet spacing modes = none, max, pgcd
+# TODO sheet spacing modes = none, max, pgcd, repeat, space
 # TODO warn when the whole page must be folded
 # TODO band_count : [(s_0,e_0,b_c_0) (s_1,e_1,b_c_1) ...]
 # TODO steps : [(s_0,e_0,step_0) (s_1,e_1,step_1) ...]
-
+# TODO max band count : prevent the pattern from growing too big
 
 class Pattern(object):
 
     def __init__(self, image_path):
-        self.path, self._image_extension = os.path.splitext(image_path)
+        self.path, self.name = os.path.split(image_path)
+        self.name, self._image_extension = os.path.splitext(self.name)
+        self._image_extension  = self._image_extension.replace('.', '')
         self._image = Image.open(image_path)
-        self._slices = np.empty((image.width,), dtype=object)
+        self._slices = np.empty((self._image.width,), dtype=object)
         self._bands = []
         self._update_attributes()
 
@@ -30,13 +33,17 @@ class Pattern(object):
         - max sheet count : {max_slice_count}\n
         - rec sheet count : {rec_sheet_count}"""
 
-    def preprocess(self):
+    def preprocess(self, invert=False):
         self._fill_background()
         self._transform_black_white()
         self._emphasize_image()
         self._transform_binary()
         self._crop_image()
         self._smooth_image()
+        
+        if invert:
+            self._invert()
+
         self._update_attributes()
 
     def slice_image(self):
@@ -77,8 +84,18 @@ class Pattern(object):
         else:
             self._image.show()
 
-    def save_image(self):
-        self._pattern_image.save(self.name
+    def save_image(self, image_path=None):
+        saving_path = os.path.join('patterns/', self.name)
+        if image_path is not None:
+            if type(image_path) is str and image_path:
+                saving_path = image_path
+        saving_path, ext = os.path.splitext(saving_path)
+        ext = ext.replace('.', '')
+        if not ext:
+            ext = self._image_extension
+        ext = 'png'
+        saving_path += '.' + ext.lower()
+        self._pattern_image.save(saving_path, format=ext)
 
     def _generate_pattern_image(self, sheet_width=1):
         band_count = len(self._bands)
@@ -90,7 +107,7 @@ class Pattern(object):
     def _update_attributes(self):
         self.width = self._image.width
         self.height = self._image.height
-        self.total_band_count = len(self._bands)
+        self.band_count = len(self._bands)
 
     def _fill_background(self):
         if self._image.mode == 'RGBA':
@@ -137,6 +154,11 @@ class Pattern(object):
 
     def _smooth_image(self):
         pass
+
+    def _invert(self):
+        self._image = self._image.convert('L')
+        self._image = ImageOps.invert(self._image)
+        self._image = self._image.convert('1')
 
     def _filter_bands(self):
         for raw_slice in self._slices:
