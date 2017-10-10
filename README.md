@@ -11,19 +11,19 @@ The project can be accessed directly through a [web app](), without any installa
 # Process
 - [x] read image
 - [x] convert to grayscales
-- [ ] filter out small objects
+- [x] filter out small objects
 - [x] somehow filter / classify between b&w, the output image must be binary
 - [ ] intermediate grays could be interpreted as the slope of the folded pattern 
-- [ ] locate the boundaries, in pixels
-- [ ] infer the pattern dimensions in pixels
-- [ ] crop image to remove the white outside the actual picture frame
-- [ ] calculate the number of levels per slice
-- [ ] translate to a level (boundaries) matrix, in pixel unit
-- [ ] configure the pattern : book height, book pages (rec), margins
-- [ ] calculate the flattened width of the image in pixels (a slice with 3 levels counts as 3 slices)
-- [ ] give a recommendation for the min pages
-- [ ] convert pixel height to book mark (in cm, taking into account the margins)
-- [ ] determine the frequency of the slices
-- [ ] output the table of folds, for each sheet of paper, in cm
+- [x] locate the boundaries, in pixels
+- [x] infer the pattern dimensions in pixels
+- [x] crop image to remove the white outside the actual picture frame
+- [x] calculate the number of levels per slice
+- [x] translate to a level (boundaries) matrix, in pixel unit
+- [x] configure the pattern : book height, book pages (rec), margins
+- [x] calculate the flattened width of the image in pixels (a slice with 3 levels counts as 3 slices)
+- [x] give a recommendation for the min pages
+- [x] convert pixel height to book mark (in cm, taking into account the margins)
+- [ ] filter the slices to even the slice spacing (when slices are sprayed out on multiple sheets)
+- [x] output the table of folds, for each sheet of paper, in cm
 
 greater slopes are darker (?)
