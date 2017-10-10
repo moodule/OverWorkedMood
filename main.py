@@ -23,3 +23,6 @@ book.set_size(1, 200, 0.2, 0.1)
 book.set_pattern(pattern)
 book.save_folding_table()
 print book
+print book.sheet_spacing()
+print book.sheet_count()
+print book.sheet_height()

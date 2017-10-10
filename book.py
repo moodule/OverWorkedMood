@@ -7,10 +7,25 @@ import os
 # (the best is to fold at the margin limit so that no paper will poke out)
 # the idea is to create an empty space between the parts of the pattern
 
+book_page = """
+
+    |<---------------->|
+  ^ ####################
+  | ####################
+  | ####################
+  | ####################
+  | ####################
+  | ####################
+  | ####################
+"""
+sheet_size_line = ''
+horizontal_margin_line = ''
+vertical_margin_line = ''
+
 folding_table_header = """
 {pattern_name:=<080}
 The folding marks are measured from the bottom of the page.
-The blank pages are meant to be fold all the way from top to bottom.
+The blank pages are meant to be folded all the way, from top to bottom.
 The measurements are given in cm.
 {page: <04}\t{lower_mark: <05}\t{upper_mark: <05}
 {filler:=<080}\n"""
@@ -23,16 +38,25 @@ Enjoy your time folding !"""
 folding_table_blank_line = '{page: <04d}\t{lower: <05.1f}\t{upper: <05.1f}\tThis page is blank !\n'
 folding_table_folded_line = '{page: <04d}\t{lower: <05.1f}\t{upper: <05.1f}\n'
 
+not_enough_pages_warning = """
+! The book has only {sheet_count} sheets of paper while the pattern requires {band_count} !"""
+
 class Book(object):
-    """Models the whole book"""
+    """Models the whole book.
+    It is chosen to match the aspect ratio of the pattern, which is considered fixed.
+    To adjust the aspect ratio of the folded pattern, you can play with :
+        - the book size (sheet size, number of pages)
+        - the margins around the folded pattern (optimal values are calculated)
+        - the opening of the book (3 cases : 90, 180 and 360)"""
    
     def __init__(self):
-        self._first_page = 1           # no unit, the total page count, equals last page number
+        self._first_page = 1            # no unit, the total page count, equals last page number
         self._last_page = 100
-        self._sheet_height = 0.2                 # taking the margin into account
+        self._sheet_height = 0.2        # taking the margin into account
         self._sheet_depth = 0.1
-        self._horizontal_margin = 10             # no unit, it is the number of sheets left both before and after the pattern
-        self._vertical_margin = 0.01             # in meters, the blank space left both above and under the pattern
+        self._horizontal_margin = 0     # no unit, it is the number of sheets left both before and after the pattern
+        self._vertical_margin = 0.0     # in meters, the blank space left both above and under the pattern
+        self._opening = 180             # in degrees, the angle of opening calculated to preserve the aspect ratio
         self._pattern = None
 
     def __str__(self):
@@ -41,19 +65,19 @@ class Book(object):
         return str_format
 
     def sheet_count(self):  # the actual number of pages used in the pattern
-        total_sheet_count = math.ceil(float(self._last_page - self._first_page + 1) / 2.0)
+        total_sheet_count = int(math.ceil(float(self._last_page - self._first_page + 1) / 2.0))
         pattern_sheet_count = total_sheet_count - 2 * self._horizontal_margin
         pattern_sheet_count = max(pattern_sheet_count, 0)
-        return (self._horizontal_margin, pattern_sheet_count, self._horizontal_margin)
+        return (self._horizontal_margin, pattern_sheet_count, self._horizontal_margin, total_sheet_count)
 
     def sheet_height(self):
         pattern_height = self._sheet_height - 2.0 * self._vertical_margin
-        pattern_height = max(0.0, pattern_height)
-        return (self._vertical_margin, pattern_height, self._vertical_margin)
+        pattern_height = round(max(0.0, pattern_height), 3)
+        return (self._vertical_margin, pattern_height, self._vertical_margin, self._sheet_height)
 
     def sheet_spacing(self):
         max_spacing = 2.0 * 3.1416 * self._sheet_depth
-        max_spacing = max_spacing / sum(self.sheet_count())
+        max_spacing = max_spacing / self.sheet_count()[3]
         return (0.25 * max_spacing, 0.5 * max_spacing, max_spacing)
 
     def aspect_ratio(self):
@@ -78,7 +102,7 @@ class Book(object):
 
     def name(self):
         book_name = ''
-        if self._pattern:
+        if self._pattern is not None:
             book_name = self._pattern.name()
         return book_name
 
@@ -88,18 +112,52 @@ class Book(object):
         self._sheet_height = sheet_height
         self._sheet_depth = sheet_depth
 
-    def set_margins(self, page_margin, paper_margin):
-        """The margins are symetrical (top = bottom, and left = right)"""
-        if (self._sheet_height - (2.0 * paper_margin)) > 0.0:
-            self._vertical_margin = paper_margin
-        if (self._last_page - (2 * page_margin)) > 0:
-            self._horizontal_margin = page_margin
-
     def set_pattern(self, pattern):
         self._pattern = pattern
+        self._calculate_margins()
+        if self._pattern.width(raw=False) > self.sheet_count()[3]:
+            print not_enough_pages_warning.format(
+                    sheet_count=self.sheet_count()[3],
+                    band_count=self._pattern.width(raw=False)) 
 
-    def calculate_margins(self):
-        pass
+    def _calculate_margins(self):
+        self._calculate_horizontal_margin()
+        self._calculate_book_opening()
+        self._calculate_vertical_margin()
+
+    def _calculate_horizontal_margin(self):
+        self._horizontal_margin = 0
+        if self._pattern is not None:
+            self._horizontal_margin = self.sheet_count()[3] - self._pattern.width(raw=False)
+            self._horizontal_margin = max(0, self._horizontal_margin) // 2
+
+    def _calculate_book_opening(self):
+        self._book_opening = 180
+        if self._pattern is not None:
+            pattern_width_360 = self.sheet_spacing()[2] * float(self.sheet_count()[1])
+            pattern_height_360 = pattern_width_360 / self._pattern.aspect_ratio(raw=False)
+            pattern_to_sheet_ratio = pattern_height_360 / self.sheet_height()[3]
+            if pattern_to_sheet_ratio < 1.0:
+                self._book_opening = 360
+            elif pattern_to_sheet_ratio < 2.0:
+                self._book_opening = 180
+            else:
+                self._book_opening = 90
+
+    def _calculate_vertical_margin(self):
+        self._vertical_margin = 0.0
+        if self._pattern is not None:
+            pattern_width_360 = self.sheet_spacing()[2] * float(self.sheet_count()[1])
+            pattern_height_360 = pattern_width_360 / self._pattern.aspect_ratio(raw=False)
+            self._vertical_margin = 0.5 * self.sheet_height()[3]
+            if self._book_opening == 360:
+                self._vertical_margin -= 0.5 * pattern_height_360
+            elif self._book_opening == 180:
+                self._vertical_margin -= 0.25 * pattern_height_360
+            else:
+                self._vertical_margin -= 0.125 * pattern_height_360
+            self._vertical_margin = max(0.0, self._vertical_margin)
+            self._vertical_margin = round(self._vertical_margin, 3)
 
     def save_folding_table(self, pattern_path=None):
         saving_path = os.path.join('patterns/', self.name())
@@ -122,7 +180,7 @@ class Book(object):
             error_message += 'I/O Error({1}) : {2}'
             error_message = error_message.format(saving_path, e.errno, e.strerror)
         
-        if self._pattern:
+        if self._pattern is not None:
             folding_table = folding_table_header.format(
                 pattern_name='= ' + self._pattern.name() + ' ',
                 page='Page',

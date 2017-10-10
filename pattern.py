@@ -4,12 +4,11 @@ from PIL import Image
 from PIL import ImageOps
 
 # TODO normaliser / augmenter le contraste : plutot que d'avoir un critere absolu b&w
-# TODO even the sheet spacing
 # TODO sheet spacing modes = none, max, pgcd, repeat, space
-# TODO take blank slices into account ! fold the whole page => create an empty band
 # TODO band_count : [(s_0,e_0,b_c_0) (s_1,e_1,b_c_1) ...]
 # TODO steps : [(s_0,e_0,step_0) (s_1,e_1,step_1) ...]
-# TODO max band count : prevent the pattern from growing too big
+
+pattern_str = ''
 
 class Pattern(object):
 
