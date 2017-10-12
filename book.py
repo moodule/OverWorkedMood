@@ -1,12 +1,6 @@
 import math
 import os
 
-# TODO estimate the (min) number of pages to create a pattern
-# TODO estimate the optimal height of the book to match the ratio
-# TODO you can either fold the blank pages in half or at the margin
-# (the best is to fold at the margin limit so that no paper will poke out)
-# the idea is to create an empty space between the parts of the pattern
-
 book_page = """
 
     |<---------------->|
@@ -170,45 +164,21 @@ class Book(object):
             ext = 'txt'
         saving_path += '_pattern.' + ext.lower()
 
-        pattern_file = None
-        try:
-            pattern_file = open(saving_path, 'w')
-        except IOError as e:
-            error_message = '! Cannot open {0} !\n'
-            error_message += 'Please make sure that the folder ./patterns/ exists\n'
-            error_message += 'If it does check your writing permissions\n'
-            error_message += 'I/O Error({1}) : {2}'
-            error_message = error_message.format(saving_path, e.errno, e.strerror)
+        with open(saving_path, 'w') as pattern_file:
+       
+            if self._pattern is not None:
+                folding_table = folding_table_header.format(
+                    pattern_name='= ' + self._pattern.name() + ' ',
+                    page='Page',
+                    lower_mark='Lower',
+                    upper_mark='Upper',
+                    filler='')
         
-        if self._pattern is not None:
-            folding_table = folding_table_header.format(
-                pattern_name='= ' + self._pattern.name() + ' ',
-                page='Page',
-                lower_mark='Lower',
-                upper_mark='Upper',
-                filler='')
-        
-            for i, band in enumerate(self._pattern._bands):
-                is_blank_page = (band[0] == band[1])
-                current_page = self._first_page + 2 * i
-                lower_mark = 100.0 * self._pixel_to_sheet_coordinate(band[1])
-                upper_mark = 100.0 * self._pixel_to_sheet_coordinate(band[0])
-                if is_blank_page:
-                    lower_mark = 0.0
-                    upper_mark = 100.0 * self._sheet_height
-                    folding_table += folding_table_blank_line.format(
-                            page=current_page,
-                            lower=lower_mark,
-                            upper=upper_mark)
-                else:
-                    folding_table += folding_table_folded_line.format(
-                            page=current_page,
-                            lower=lower_mark,
-                            upper=upper_mark)
+                for i, band in enumerate(self._pattern._bands):
+                    folding_table += self._band_to_folding_marks_line_str(i, band)
 
-            folding_table += folding_table_footer
+                folding_table += folding_table_footer
 
-        if pattern_file:
             pattern_file.write(folding_table)
             pattern_file.close()
             print 'Your pattern has been saved to {file_path}.'.format(file_path=saving_path)
@@ -220,3 +190,23 @@ class Book(object):
         pixel_ratio = self._pattern.vertical_coordinate_ratio(pixel_y, from_top=False, raw=False)
         coordinate = self._vertical_margin + (pixel_ratio * self.sheet_height()[1])
         return coordinate
+
+    def _band_to_folding_marks_line_str(self, index, band):
+        folding_marks_line = ''
+        is_blank_page = (band[0] == band[1])
+        current_page = self._first_page + 2 * index
+        lower_mark = 100.0 * self._pixel_to_sheet_coordinate(band[1])
+        upper_mark = 100.0 * self._pixel_to_sheet_coordinate(band[0])
+        if is_blank_page:
+            lower_mark = 0.0
+            upper_mark = 100.0 * self._sheet_height
+            folding_marks_line = folding_table_blank_line.format(
+                                    page=current_page,
+                                    lower=lower_mark,
+                                    upper=upper_mark)
+        else:
+            folding_marks_line = folding_table_folded_line.format(
+                                    page=current_page,
+                                    lower=lower_mark,
+                                    upper=upper_mark)
+

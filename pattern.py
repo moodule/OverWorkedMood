@@ -1,3 +1,4 @@
+import fractions
 import numpy as np
 import os
 from PIL import Image
@@ -21,6 +22,8 @@ class Pattern(object):
         self._bands = []
         self._min_band_count = 100
         self._max_band_count = 500
+        self._band_ranges = []
+        self._step_ranges = []
 
     def __str__(self):
         str_format = """{pattern_name:=<050}
@@ -232,3 +235,9 @@ pattern ({pattern_width} x {pattern_height}) ratio {pattern_ratio}"""
         x = band_index * sheet_width
         for y in range(band[0], band[1]):
             self._pattern_image.putpixel((x,y), False)
+
+def lcm(a, b):
+    gcd = fractions.gcd(a, b)
+    if not gcd:
+        gcd = 1
+    return (a * b) // gcd
