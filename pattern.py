@@ -1,4 +1,5 @@
 import fractions
+import math
 import numpy as np
 import os
 from PIL import Image
@@ -24,6 +25,7 @@ class Pattern(object):
         self._max_band_count = 500
         self._band_ranges = []
         self._band_count = set()
+        self._dropout_factor = 1
         self._step_ranges = []
 
     def __str__(self):
@@ -103,7 +105,7 @@ pattern ({pattern_width} x {pattern_height}) ratio {pattern_ratio}"""
             current_start = -1
             current_end = -1
             for y in xrange(self.height(raw=True)):
-                current_color = temp[x,y]
+                current_color = temp[x, y]
                 if current_color != previous_color:
                     if current_color:
                         current_end = y - 1     # can't happen at y=0
@@ -117,9 +119,9 @@ pattern ({pattern_width} x {pattern_height}) ratio {pattern_ratio}"""
                         self._slices[x].append((current_start, self.height(raw=True) - 1))
                 previous_color = current_color
 
-    def postprocess(self):
+    def postprocess(self, wanted_width=None):
         self._filter_bands()
-        self._even_slice_spacing()
+        self._even_slice_spacing(wanted_width)
         self._isolate_bands()
         self._generate_pattern_image()
         self._check_pattern()
@@ -203,16 +205,18 @@ pattern ({pattern_width} x {pattern_height}) ratio {pattern_ratio}"""
         self._image = self._image.convert('1')
 
     def _filter_bands(self):
-        threshold = max((self.height(raw=True) // 300), 2)
-        for raw_slice in self._slices:
+        threshold = max((self.height(raw=True) // 40), 2)
+        for i in range(len(self._slices)):
+            raw_slice = self._slices[i]
             new_slice = []
             for band in raw_slice:
                 if (band[1]-band[0]) > threshold:
                     new_slice.append(band)
-            raw_slice = new_slice
+            self._slices[i] = new_slice
 
-    def _even_slice_spacing(self):
+    def _even_slice_spacing(self, wanted_width=None):
         self._identify_band_ranges()
+        self._calculate_dropout_factor(wanted_width)
         self._calculate_step_ranges()
 
     def _identify_band_ranges(self):
@@ -231,14 +235,23 @@ pattern ({pattern_width} x {pattern_height}) ratio {pattern_ratio}"""
             if i == len(self._slices) - 1:
                 self._band_ranges.append((current_start, len(self._slices), current_count))
 
+    def _calculate_dropout_factor(self, wanted_width=None):
+        """Once evened the pattern has roughly the same width as the original image.
+        Number of bands ~= number of slices = image width"""
+        self._dropout_factor = 1
+        if wanted_width is not None:
+            self._dropout_factor = float(self.width(raw=True)) / float(wanted_width)
+            self._dropout_factor = int(math.ceil(self._dropout_factor))
+            self._dropout_factor = max(1, self._dropout_factor)
+
     def _calculate_step_ranges(self):
         #step_lcm = reduce(lcm, list(self._band_count))
-        step_lcm = 4 * max(list(self._band_count))
+        #step_lcm = 3 * max(list(self._band_count))
         for (s, e, c) in self._band_ranges:
             if c:
-                self._step_ranges.append((s, e, step_lcm // c))
+                self._step_ranges.append((s, e, self._dropout_factor * c))
             else:
-                self._step_ranges.append((s, e, step_lcm))
+                self._step_ranges.append((s, e, self._dropout_factor))
 
     def _check_pattern(self):
         if self.width(False) < self._min_band_count:
@@ -254,6 +267,7 @@ pattern ({pattern_width} x {pattern_height}) ratio {pattern_ratio}"""
                 self._bands += s
                 if len(s) == 0:     # if the slice is blank we represent it by an empty band
                     self._bands.append((0,0))       # otherwise the pattern would skip the blank parts
+        #self._bands = self._bands[::2]
 
     def _fill_image_band(self, band_index, sheet_width=1):
         """The sheet is represented by [sheet_width] columns :

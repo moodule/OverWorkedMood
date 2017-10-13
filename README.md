@@ -24,7 +24,7 @@ The project can be accessed directly through a [web app](), without any installa
 - [x] calculate the flattened width of the image in pixels (a slice with 3 levels counts as 3 slices)
 - [x] give a recommendation for the min pages
 - [x] convert pixel height to book mark (in cm, taking into account the margins)
-- [ ] filter the slices to even the slice spacing (when slices are sprayed out on multiple sheets)
+- [x] filter and dropout the slices to even the slice spacing (when slices are sprayed out on multiple sheets)
 - [x] output the table of folds, for each sheet of paper, in cm
 - [ ] interprete the layer bounds as (x, y) graphs and display them
 - [ ] describe the workflow to get a book folding art

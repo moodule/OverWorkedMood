@@ -129,7 +129,7 @@ class Book(object):
         self._book_opening = 180
         if self._pattern is not None:
             pattern_width_360 = self.sheet_spacing()[2] * float(self.sheet_count()[1])
-            pattern_height_360 = pattern_width_360 / self._pattern.aspect_ratio(raw=False)
+            pattern_height_360 = pattern_width_360 / self._pattern.aspect_ratio(raw=True)
             pattern_to_sheet_ratio = pattern_height_360 / self.sheet_height()[3]
             if pattern_to_sheet_ratio < 1.0:
                 self._book_opening = 360
@@ -142,7 +142,7 @@ class Book(object):
         self._vertical_margin = 0.0
         if self._pattern is not None:
             pattern_width_360 = self.sheet_spacing()[2] * float(self.sheet_count()[1])
-            pattern_height_360 = pattern_width_360 / self._pattern.aspect_ratio(raw=False)
+            pattern_height_360 = pattern_width_360 / self._pattern.aspect_ratio(raw=True)
             self._vertical_margin = 0.5 * self.sheet_height()[3]
             if self._book_opening == 360:
                 self._vertical_margin -= 0.5 * pattern_height_360

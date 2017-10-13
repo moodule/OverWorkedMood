@@ -7,18 +7,15 @@ from PIL import Image
 #   fit a pattern to the image
 #   find the right book
 #   fold !
+# actually it can go both ways
 
-pattern = pattern.Pattern('images/exemples/test.png')
+pattern = pattern.Pattern('images/exemples/hurricane_4.jpg')
 pattern.preprocess(invert=False)
 pattern.slice_image()
-pattern.postprocess()
-#pattern.show()
-#pattern._generate_pattern_image(sheet_width=1)
-#pattern.show()
+pattern.postprocess(300)
 print pattern
-print pattern._band_ranges
-print pattern._band_count
-print pattern._step_ranges
+pattern.show()
+print pattern._dropout_factor
 
 book = book.Book()
 book.set_size(1, 600, 0.2, 0.1)
