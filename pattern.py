@@ -23,6 +23,7 @@ class Pattern(object):
         self._min_band_count = 100
         self._max_band_count = 500
         self._band_ranges = []
+        self._band_count = set()
         self._step_ranges = []
 
     def __str__(self):
@@ -211,7 +212,33 @@ pattern ({pattern_width} x {pattern_height}) ratio {pattern_ratio}"""
             raw_slice = new_slice
 
     def _even_slice_spacing(self):
-        pass
+        self._identify_band_ranges()
+        self._calculate_step_ranges()
+
+    def _identify_band_ranges(self):
+        self._band_ranges = []
+        current_count = len(self._slices[0])
+        current_start = 0
+        for i, s in enumerate(self._slices):
+            if s:
+                self._band_count.add(len(s))
+            else:
+                self._band_count.add(1) # an empty slice (blank column) counts as a single band
+            if len(s) != current_count:
+                self._band_ranges.append((current_start, i, current_count))
+                current_start = i
+                current_count = len(s)
+            if i == len(self._slices) - 1:
+                self._band_ranges.append((current_start, len(self._slices), current_count))
+
+    def _calculate_step_ranges(self):
+        #step_lcm = reduce(lcm, list(self._band_count))
+        step_lcm = 4 * max(list(self._band_count))
+        for (s, e, c) in self._band_ranges:
+            if c:
+                self._step_ranges.append((s, e, step_lcm // c))
+            else:
+                self._step_ranges.append((s, e, step_lcm))
 
     def _check_pattern(self):
         if self.width(False) < self._min_band_count:
@@ -219,13 +246,14 @@ pattern ({pattern_width} x {pattern_height}) ratio {pattern_ratio}"""
         if self.width(False) > self._max_band_count:
             print '! Warning ! The pattern will require a huge number of pages to fold'
 
-    def _isolate_bands(self, step=1):
+    def _isolate_bands(self):
     # TODO process the ranges with the same band count independantly (one step per region)
         self._bands = []
-        for s in self._slices[::step]:
-            self._bands += s
-            if len(s) == 0:     # if the slice is blank we represent it by an empty band
-                self._bands.append((0,0))       # otherwise the pattern would skip the blank parts
+        for (i_s, i_e, step) in self._step_ranges:
+            for s in self._slices[i_s:i_e:step]:
+                self._bands += s
+                if len(s) == 0:     # if the slice is blank we represent it by an empty band
+                    self._bands.append((0,0))       # otherwise the pattern would skip the blank parts
 
     def _fill_image_band(self, band_index, sheet_width=1):
         """The sheet is represented by [sheet_width] columns :

@@ -16,10 +16,12 @@ pattern.postprocess()
 #pattern._generate_pattern_image(sheet_width=1)
 #pattern.show()
 print pattern
-#print pattern._bands
+print pattern._band_ranges
+print pattern._band_count
+print pattern._step_ranges
 
 book = book.Book()
-book.set_size(1, 200, 0.2, 0.1)
+book.set_size(1, 600, 0.2, 0.1)
 book.set_pattern(pattern)
 book.save_folding_table()
 print book

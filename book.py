@@ -209,4 +209,4 @@ class Book(object):
                                     page=current_page,
                                     lower=lower_mark,
                                     upper=upper_mark)
-
+        return folding_marks_line
