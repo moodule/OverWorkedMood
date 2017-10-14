@@ -9,7 +9,7 @@ from PIL import Image
 #   fold !
 # actually it can go both ways
 
-pattern = pattern.Pattern('images/exemples/hurricane_4.jpg')
+pattern = pattern.Pattern('images/examples/github.png')
 pattern.preprocess(invert=False)
 pattern.slice_image()
 pattern.postprocess(300)
