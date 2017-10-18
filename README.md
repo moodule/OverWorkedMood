@@ -28,6 +28,7 @@ The project can be accessed directly through a [web app](), without any installa
 - [x] convert pixel height to book mark (in cm, taking into account the margins)
 - [x] filter and dropout the slices to even the slice spacing (when slices are sprayed out on multiple sheets)
 - [x] output the table of folds, for each sheet of paper, in cm
+- [ ] exception for the fully black pages : no folding at all
 - [ ] interprete the layer bounds as (x, y) graphs and display them
 - [ ] describe the workflow(s) to get a book folding art
 - [ ] put everything into a notebook
