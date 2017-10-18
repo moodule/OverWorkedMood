@@ -15,10 +15,10 @@ pattern.slice_image()
 pattern.postprocess(300)
 print pattern
 pattern.show()
-print pattern._dropout_factor
+#print pattern._dropout_factor
 
 book = book.Book()
-book.set_size(1, 600, 0.2, 0.1)
+book.set_size(1, 300, 0.2, 0.1)
 book.set_pattern(pattern)
 book.save_folding_table()
 print book

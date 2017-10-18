@@ -14,6 +14,8 @@ The project can be accessed directly through a [web app](), without any installa
 - [x] filter out small objects
 - [x] somehow filter / classify between b&w, the output image must be binary
 - [ ] intermediate grays could be interpreted as the slope of the folded pattern 
+- [ ] divide gray values into several (3 ?) levels : white, shadow, black
+- [ ] calculate an intermediate folding for shadow grays
 - [x] locate the boundaries, in pixels
 - [x] infer the pattern dimensions in pixels
 - [x] crop image to remove the white outside the actual picture frame
@@ -27,7 +29,7 @@ The project can be accessed directly through a [web app](), without any installa
 - [x] filter and dropout the slices to even the slice spacing (when slices are sprayed out on multiple sheets)
 - [x] output the table of folds, for each sheet of paper, in cm
 - [ ] interprete the layer bounds as (x, y) graphs and display them
-- [ ] describe the workflow to get a book folding art
+- [ ] describe the workflow(s) to get a book folding art
 - [ ] put everything into a notebook
 
-greater slopes are darker (?)
+greater slopes are more bright (?)
