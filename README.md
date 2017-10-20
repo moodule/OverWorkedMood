@@ -13,6 +13,7 @@ The project can be accessed directly through a [web app](), without any installa
 - [x] convert to grayscales
 - [x] filter out small objects
 - [x] somehow filter / classify between b&w, the output image must be binary
+- [ ] restructure the repository : docs, tests etc (cf (Kenneth Reitz)[https://github.com/requests/requests])
 - [ ] intermediate grays could be interpreted as the slope of the folded pattern 
 - [ ] divide gray values into several (3 ?) levels : white, shadow, black
 - [ ] calculate an intermediate folding for shadow grays
@@ -32,5 +33,8 @@ The project can be accessed directly through a [web app](), without any installa
 - [ ] interprete the layer bounds as (x, y) graphs and display them
 - [ ] describe the workflow(s) to get a book folding art
 - [ ] put everything into a notebook
+- [ ] creates tests
+- [ ] add a license, requirements and contribute files
+- [ ] generate the docs
 
 greater slopes are more bright (?)
