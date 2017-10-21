@@ -6,11 +6,8 @@ from PIL import Image
 from PIL import ImageOps
 
 # TODO normaliser / augmenter le contraste : plutot que d'avoir un critere absolu b&w
-# TODO sheet spacing modes = none, max, pgcd, repeat, space
-# TODO band_count : [(s_0,e_0,b_c_0) (s_1,e_1,b_c_1) ...]
-# TODO steps : [(s_0,e_0,step_0) (s_1,e_1,step_1) ...]
 
-pattern_str = ''
+PATTERN_STR = ''
 
 class Pattern(object):
 
@@ -83,6 +80,12 @@ pattern ({pattern_width} x {pattern_height}) ratio {pattern_ratio}"""
             r = 1.0 - r
         r = min(1.0, max(0.0, r))
         return r
+
+    def is_white_band(self, band):
+        return (band[0] == band[1])
+
+    def is_black_band(self, band):
+        return (band[0] == 0) and (band[1] >= (self.height(raw=False) - 1))
 
     def preprocess(self, invert=False):
         self._fill_background()
@@ -245,8 +248,6 @@ pattern ({pattern_width} x {pattern_height}) ratio {pattern_ratio}"""
             self._dropout_factor = max(1, self._dropout_factor)
 
     def _calculate_step_ranges(self):
-        #step_lcm = reduce(lcm, list(self._band_count))
-        #step_lcm = 3 * max(list(self._band_count))
         for (s, e, c) in self._band_ranges:
             if c:
                 self._step_ranges.append((s, e, self._dropout_factor * c))
@@ -260,14 +261,12 @@ pattern ({pattern_width} x {pattern_height}) ratio {pattern_ratio}"""
             print '! Warning ! The pattern will require a huge number of pages to fold'
 
     def _isolate_bands(self):
-    # TODO process the ranges with the same band count independantly (one step per region)
         self._bands = []
         for (i_s, i_e, step) in self._step_ranges:
             for s in self._slices[i_s:i_e:step]:
                 self._bands += s
                 if len(s) == 0:     # if the slice is blank we represent it by an empty band
                     self._bands.append((0,0))       # otherwise the pattern would skip the blank parts
-        #self._bands = self._bands[::2]
 
     def _fill_image_band(self, band_index, sheet_width=1):
         """The sheet is represented by [sheet_width] columns :
@@ -277,9 +276,3 @@ pattern ({pattern_width} x {pattern_height}) ratio {pattern_ratio}"""
         x = band_index * sheet_width
         for y in range(band[0], band[1]):
             self._pattern_image.putpixel((x,y), False)
-
-def lcm(a, b):
-    gcd = fractions.gcd(a, b)
-    if not gcd:
-        gcd = 1
-    return (a * b) // gcd

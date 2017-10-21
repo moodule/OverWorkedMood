@@ -9,10 +9,10 @@ from PIL import Image
 #   fold !
 # actually it can go both ways
 
-pattern = pattern.Pattern('images/examples/tensorflow.png')
+pattern = pattern.Pattern('images/examples/github.png')
 pattern.preprocess(invert=False)
 pattern.slice_image()
-pattern.postprocess(140)
+pattern.postprocess(160)
 print pattern
 pattern.show()
 #print pattern._dropout_factor

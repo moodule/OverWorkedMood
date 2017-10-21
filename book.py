@@ -209,20 +209,25 @@ class Book(object):
 
     def _band_to_folding_marks_line_str(self, index, band):
         folding_marks_line = ''
-        is_blank_page = (band[0] == band[1])
         current_page = self._first_page + 2 * self._horizontal_margin + 2 * index
         lower_mark = 100.0 * self._pixel_to_sheet_coordinate(band[1])
         upper_mark = 100.0 * self._pixel_to_sheet_coordinate(band[0])
-        if is_blank_page:
+        if self._pattern.is_white_band(band):
             lower_mark = 0.0
             upper_mark = 100.0 * self._sheet_height
             folding_marks_line = FOLDING_TABLE_BLANK_LINE.format(
-                                    page=current_page,
-                                    lower=lower_mark,
-                                    upper=upper_mark)
+                    page=current_page,
+                    lower=lower_mark,
+                    upper=upper_mark)
+        elif self._pattern.is_black_band(band):
+            if not self._vertical_margin:
+                folding_marks_line = FOLDING_TABLE_BLACK_LINE.format(
+                        page = current_page,
+                        lower = '-',
+                        upper = '-')
         else:
             folding_marks_line = FOLDING_TABLE_FOLDED_LINE.format(
-                                    page=current_page,
-                                    lower=lower_mark,
-                                    upper=upper_mark)
+                    page=current_page,
+                    lower=lower_mark,
+                    upper=upper_mark)
         return folding_marks_line
