@@ -1,5 +1,5 @@
-import pattern
-import book
+import overworked.pattern
+import overworked.book
 from PIL import Image
 
 # TODO describe the workflow :
@@ -9,7 +9,7 @@ from PIL import Image
 #   fold !
 # actually it can go both ways
 
-pattern = pattern.Pattern('images/examples/github.png')
+pattern = pattern.Pattern('examples/github/github.png')
 pattern.preprocess(invert=False)
 pattern.slice_image()
 pattern.postprocess(160)
