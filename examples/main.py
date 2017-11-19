@@ -1,5 +1,5 @@
-import overworked.pattern
-import overworked.book
+import ..overworked.pattern as pattern
+import IIoverworked.book as book
 from PIL import Image
 
 # TODO describe the workflow :
@@ -9,7 +9,7 @@ from PIL import Image
 #   fold !
 # actually it can go both ways
 
-pattern = pattern.Pattern('examples/github/github.png')
+pattern = pattern.Pattern('github/github.png')
 pattern.preprocess(invert=False)
 pattern.slice_image()
 pattern.postprocess(160)
@@ -18,7 +18,7 @@ pattern.show()
 #print pattern._dropout_factor
 
 book = book.Book()
-book.set_size(1, 300, 0.2, 0.1)
+book.set_size(1, 589, 0.2, 0.15)
 book.set_pattern(pattern)
 book.save_folding_table()
 print book

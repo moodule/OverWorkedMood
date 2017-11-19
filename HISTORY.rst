@@ -53,6 +53,6 @@ Release History
 0.0.1 (2017-09-13)
 ++++++++++++++++++
 
-* Random learning project
+* Random project to refresh my python skills
 * Some free time but not enough to read
 * Flat cluttered with old, dusty, unknown books

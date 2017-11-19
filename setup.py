@@ -52,7 +52,7 @@ requires = [
 test_requirements = ['pytest-httpbin==0.0.7', 'pytest-cov', 'pytest-mock', 'pytest-xdist', 'PySocks>=1.5.6, !=1.5.7', 'pytest>=2.8.0']
 
 about = {}
-with open(os.path.join(here, 'requests', '__version__.py'), 'r', 'utf-8') as f:
+with open(os.path.join(here, 'overworked', '__version__.py'), 'r', 'utf-8') as f:
     exec(f.read(), about)
 
 with open('README.rst', 'r', 'utf-8') as f:
@@ -93,9 +93,5 @@ setup(
     ),
     cmdclass={'test': PyTest},
     tests_require=test_requirements,
-    extras_require={
-        'security': ['pyOpenSSL>=0.14', 'cryptography>=1.3.4', 'idna>=2.0.0'],
-        'socks': ['PySocks>=1.5.6, !=1.5.7'],
-        'socks:sys_platform == "win32" and (python_version == "2.7" or python_version == "2.6")': ['win_inet_pton'],
-    },
+    extras_require={},
 )
