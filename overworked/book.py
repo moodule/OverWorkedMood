@@ -1,5 +1,6 @@
 import math
 import os
+import _tools
 
 BOOK_PAGE = """
 """
@@ -157,16 +158,11 @@ class Book(object):
             self._vertical_margin = max(0.0, self._vertical_margin)
             self._vertical_margin = round(self._vertical_margin, 3)
 
-    def save_folding_table(self, pattern_path=None):
-        saving_path = self.name()
-        if pattern_path is not None:
-            if type(pattern_path) is str and pattern_path:
-                saving_path = pattern_path
-        saving_path, ext = os.path.splitext(saving_path)
-        ext = ext.replace('.', '')
-        if not ext:
-            ext = 'txt'
-        saving_path += '_pattern.' + ext.lower()
+    def save_folding_table(self, pattern_name='', pattern_path=''):
+        saving_path = _tools.full_path_to_file(
+                name=self.name() if not pattern_name else pattern_name,
+                path='./' if not pattern_path else pattern_path,
+                extension='txt')
 
         with open(saving_path, 'w') as pattern_file:
        

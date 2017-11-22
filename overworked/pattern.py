@@ -4,6 +4,7 @@ import numpy as np
 import os
 from PIL import Image
 from PIL import ImageOps
+import _tools
 
 # TODO normaliser / augmenter le contraste : plutot que d'avoir un critere absolu b&w
 
@@ -128,7 +129,6 @@ pattern ({pattern_width} x {pattern_height}) ratio {pattern_ratio}"""
         self._isolate_bands()
         self._generate_pattern_image()
         self._check_pattern()
-        self.save_image()
         #self.save_pattern()
 
     def show(self, source='pattern'):
@@ -137,17 +137,11 @@ pattern ({pattern_width} x {pattern_height}) ratio {pattern_ratio}"""
         else:
             self._image.show()
 
-    def save_image(self, image_path=None):
-        saving_path = os.path.join('patterns/', self._name)
-        if image_path is not None:
-            if type(image_path) is str and image_path:
-                saving_path = image_path
-        saving_path, ext = os.path.splitext(saving_path)
-        ext = ext.replace('.', '')
-        if not ext:
-            ext = self._image_extension
-        ext = 'png'
-        saving_path += '_preview.' + ext.lower()
+    def save_image_preview(self, image_name='', image_path=''):
+        saving_path = _tools.full_path_to_file(
+                name=self.name if not image_name else image_name,
+                path='./' if not image_path else image_path,
+                extension='png')
         self._pattern_image.save(saving_path, format=ext)
 
     def _generate_pattern_image(self, sheet_width=3):
