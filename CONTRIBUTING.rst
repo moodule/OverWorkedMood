@@ -38,8 +38,8 @@ and "help wanted" is open to whoever wants to implement it.
 Write Documentation
 ~~~~~~~~~~~~~~~~~~~
 
-Industrious Moodule could always use more documentation, whether as part of the
-official Industrious Moodule docs, in docstrings, or even on the web in blog posts,
+Overworked Moodule could always use more documentation, whether as part of the
+official Overworked Moodule docs, in docstrings, or even on the web in blog posts,
 articles, and such.
 
 Submit Feedback
@@ -78,7 +78,7 @@ Ready to contribute? Here's how to set up `overworked-moodule` for local develop
 
 5. When you're done making changes, check that your changes pass flake8 and the tests, including testing other Python versions with tox::
 
-    $ flake8 overworked-moodule tests
+    $ flake8 overworked tests
     $ python setup.py test or py.test
     $ tox
 
@@ -109,6 +109,4 @@ Tips
 ----
 
 To run a subset of tests::
-
-
-    $ python -m unittest tests.test_overworked-moodule
+    $ py.test tests.test_overworked

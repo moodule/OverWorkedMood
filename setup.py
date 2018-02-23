@@ -1,97 +1,64 @@
 #!/usr/bin/env python
-# Learn more: https://github.com/kennethreitz/setup.py
+# -*- coding: utf-8 -*-
 
-import os
-import re
-import sys
+"""The setup script."""
 
-from codecs import open
+from setuptools import setup, find_packages
 
-from setuptools import setup
-from setuptools.command.test import test as TestCommand
+with open('README.rst') as readme_file:
+    readme = readme_file.read()
 
-here = os.path.abspath(os.path.dirname(__file__))
+with open('HISTORY.rst') as history_file:
+    history = history_file.read()
 
-class PyTest(TestCommand):
-    user_options = [('pytest-args=', 'a', "Arguments to pass into py.test")]
-
-    def initialize_options(self):
-        TestCommand.initialize_options(self)
-        try:
-            from multiprocessing import cpu_count
-            self.pytest_args = ['-n', str(cpu_count()), '--boxed']
-        except (ImportError, NotImplementedError):
-            self.pytest_args = ['-n', '1', '--boxed']
-
-    def finalize_options(self):
-        TestCommand.finalize_options(self)
-        self.test_args = []
-        self.test_suite = True
-
-    def run_tests(self):
-        import pytest
-
-        errno = pytest.main(self.pytest_args)
-        sys.exit(errno)
-
-# 'setup.py publish' shortcut.
-if sys.argv[-1] == 'publish':
-    os.system('python setup.py sdist bdist_wheel')
-    os.system('twine upload dist/*')
-    sys.exit()
-
-packages = ['requests']
-
-requires = [
-    'chardet>=3.0.2,<3.1.0',
-    'idna>=2.5,<2.7',
-    'urllib3>=1.21.1,<1.23',
-    'certifi>=2017.4.17'
-
+requirements = [
+    'Click>=6.0',
+    # TODO: put package requirements here
 ]
-test_requirements = ['pytest-httpbin==0.0.7', 'pytest-cov', 'pytest-mock', 'pytest-xdist', 'PySocks>=1.5.6, !=1.5.7', 'pytest>=2.8.0']
 
-about = {}
-with open(os.path.join(here, 'overworked', '__version__.py'), 'r', 'utf-8') as f:
-    exec(f.read(), about)
+setup_requirements = [
+    'pytest-runner',
+    # TODO(moodule): put setup requirements (distutils extensions, etc.) here
+]
 
-with open('README.rst', 'r', 'utf-8') as f:
-    readme = f.read()
-with open('HISTORY.rst', 'r', 'utf-8') as f:
-    history = f.read()
+test_requirements = [
+    'pytest',
+    # TODO: put package test requirements here
+]
 
 setup(
-    name=about['__title__'],
-    version=about['__version__'],
-    description=about['__description__'],
+    name='overworked',
+    version='0.0.0',
+    description="Upcycle your old books into beautiful art sculptures !",
     long_description=readme + '\n\n' + history,
-    author=about['__author__'],
-    author_email=about['__author_email__'],
-    url=about['__url__'],
-    packages=packages,
-    package_data={'': ['LICENSE', 'NOTICE'], 'requests': ['*.pem']},
-    package_dir={'requests': 'requests'},
+    author="David Mougeolle",
+    author_email='david.mougeolle@moodule.net',
+    url='https://github.com/moodule/overworked-moodule',
+    packages=find_packages(include=['overworked']),
+    entry_points={
+        'console_scripts': [
+            'overworked=overworked.cli:main'
+        ]
+    },
     include_package_data=True,
-    install_requires=requires,
-    license=about['__license__'],
+    install_requires=requirements,
+    license="MIT license",
     zip_safe=False,
-    classifiers=(
-        'Development Status :: 5 - Production/Stable',
+    keywords='overworked',
+    classifiers=[
+        'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',
+        'License :: OSI Approved :: MIT License',
         'Natural Language :: English',
-        'License :: OSI Approved :: Apache Software License',
-        'Programming Language :: Python',
-        'Programming Language :: Python :: 2',
+        "Programming Language :: Python :: 2",
         'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: Implementation :: CPython',
-        'Programming Language :: Python :: Implementation :: PyPy'
-    ),
-    cmdclass={'test': PyTest},
+    ],
+    test_suite='tests',
     tests_require=test_requirements,
-    extras_require={},
+    setup_requires=setup_requirements,
 )

@@ -1,12 +1,13 @@
-Overworked is written and maintained by David Mougeolle and
-well no one else !
+=======
+Credits
+=======
 
-Keepers of the Four Crystals
-````````````````````````````
+Development Lead
+----------------
 
-- David Mougeolle <david.mougeolle@moodule.net> `@moodule <https://github.com/moodule>`_, Keeper of the Master Crystal.
+* David Mougeolle <david.mougeolle@moodule.net> `@moodule <https://github.com/moodule>`_
 
 Patches and Suggestions
-```````````````````````
+-----------------------
 
-- Claire-Solène Barnezet
+* Claire-Solène Barnezet
