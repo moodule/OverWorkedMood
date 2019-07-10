@@ -13,22 +13,31 @@ with open('HISTORY.rst') as history_file:
 
 requirements = [
     'Click>=6.0',
+    'numpy>=1.13.3',
+    'Pillow>=4.3.0'
     # TODO: put package requirements here
 ]
 
 setup_requirements = [
-    'pytest-runner',
+    'bumpversion>=0.5.3',
+    'wheel>=0.29.0',
+    'watchdog>=0.8.3',
+    'Sphinx>=1.4.8',
     # TODO(moodule): put setup requirements (distutils extensions, etc.) here
 ]
 
 test_requirements = [
-    'pytest',
+    'pytest>=2.9.2',
+    'pytest-runner>=2.11.1',
+    'flake8>=2.6.0',
+    'tox>=2.3.1',
+    'coverage>=4.1'
     # TODO: put package test requirements here
 ]
 
 setup(
     name='overworked',
-    version='0.0.0',
+    version='0.6.2',
     description="Upcycle your old books into beautiful art sculptures !",
     long_description=readme + '\n\n' + history,
     author="David Mougeolle",
