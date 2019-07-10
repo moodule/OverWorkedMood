@@ -142,7 +142,7 @@ pattern ({pattern_width} x {pattern_height}) ratio {pattern_ratio}"""
                 name=self.name if not image_name else image_name,
                 path='./' if not image_path else image_path,
                 extension='png')
-        self._pattern_image.save(saving_path, format=ext)
+        self._pattern_image.save(saving_path, format='png')
 
     def _generate_pattern_image(self, sheet_width=3):
         pattern_image_width = sheet_width * self.width(raw=False)
