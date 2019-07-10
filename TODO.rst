@@ -6,6 +6,8 @@ Project
 - [ ] segregate the internal tools so that they're not exported
 - [ ] write the documentation
 - [ ] export the documentation on readthedocs
+- [ ] use the latest boilerplate autoations
+- [ ] write in the functional paradigm style, better suited
 
 Interface
 ---------
