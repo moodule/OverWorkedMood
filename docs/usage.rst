@@ -2,6 +2,6 @@
 Usage
 =====
 
-To use Overworked Moodule in a project::
+To use Overworked in a project::
 
     import overworked

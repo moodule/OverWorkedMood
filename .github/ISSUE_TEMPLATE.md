@@ -1,4 +1,4 @@
-* Overworked Moodule version:
+* Overworked version:
 * Python version:
 * Operating System:
 

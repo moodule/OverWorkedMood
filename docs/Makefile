@@ -3,8 +3,8 @@
 
 # You can set these variables from the command line.
 SPHINXOPTS    =
-SPHINXBUILD   = python -msphinx
-SPHINXPROJ    = OverworkedMoodule
+SPHINXBUILD   = pipenv run python -m sphinx
+SPHINXPROJ    = overworked
 SOURCEDIR     = .
 BUILDDIR      = _build
 

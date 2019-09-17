@@ -12,62 +12,57 @@ with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
 requirements = [
-    'Click>=6.0',
-    'numpy>=1.13.3',
-    'Pillow>=4.3.0'
-    # TODO: put package requirements here
-]
+    'Click>=7.0',
+    'numpy',
+    'Pillow', ]
 
 setup_requirements = [
-    'bumpversion>=0.5.3',
-    'wheel>=0.29.0',
-    'watchdog>=0.8.3',
-    'Sphinx>=1.4.8',
-    # TODO(moodule): put setup requirements (distutils extensions, etc.) here
-]
+    'bump2version',
+    'pytest-runner',
+    'twine',
+    'watchdog',
+    'wheel',
+    'Sphinx', ]
 
 test_requirements = [
-    'pytest>=2.9.2',
-    'pytest-runner>=2.11.1',
-    'flake8>=2.6.0',
-    'tox>=2.3.1',
-    'coverage>=4.1'
-    # TODO: put package test requirements here
-]
+    'coverage',
+    'flake8',
+    'pytest>=3',
+    'tox', ]
 
 setup(
-    name='overworked',
-    version='0.6.2',
-    description="Upcycle your old books into beautiful art sculptures !",
-    long_description=readme + '\n\n' + history,
     author="David Mougeolle",
-    author_email='david.mougeolle@moodule.net',
-    url='https://github.com/moodule/overworked-moodule',
-    packages=find_packages(include=['overworked']),
-    entry_points={
-        'console_scripts': [
-            'overworked=overworked.cli:main'
-        ]
-    },
-    include_package_data=True,
-    install_requires=requirements,
-    license="MIT license",
-    zip_safe=False,
-    keywords='overworked',
+    author_email='david.mougeolle@gmail.com',
+    python_requires='>=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*',
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Natural Language :: English',
         "Programming Language :: Python :: 2",
-        'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
     ],
+    description="Upcycle your old books into beautiful art! :arrow_up_small:",
+    entry_points={
+        'console_scripts': [
+            'overworked=overworked.cli:main',
+        ],
+    },
+    install_requires=requirements,
+    license="MIT license",
+    long_description=readme + '\n\n' + history,
+    include_package_data=True,
+    keywords='overworked',
+    name='overworked',
+    packages=find_packages(include=['overworked', 'overworked.*']),
+    setup_requires=setup_requirements,
     test_suite='tests',
     tests_require=test_requirements,
-    setup_requires=setup_requirements,
+    url='https://github.com/moodule/overworked',
+    version='0.6.2',
+    zip_safe=False,
 )
