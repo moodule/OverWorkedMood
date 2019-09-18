@@ -30,7 +30,7 @@ class Pattern(object):
         str_format = """{pattern_name:=<050}
 image ({image_width} x {image_height}) ratio {image_ratio}
 pattern ({pattern_width} x {pattern_height}) ratio {pattern_ratio}"""
-        str_format = str_format.format(
+        return str_format.format(
                 pattern_name='= Pattern ' + self._name + ' ',
                 image_width=self.width(raw=True),
                 image_height=self.height(raw=True),
@@ -38,7 +38,6 @@ pattern ({pattern_width} x {pattern_height}) ratio {pattern_ratio}"""
                 pattern_width=self.width(raw=False),
                 pattern_height=self.height(raw=False),
                 pattern_ratio=self.aspect_ratio(raw=False))
-        return str_format
 
     def name(self):
         return self._name
@@ -47,7 +46,7 @@ pattern ({pattern_width} x {pattern_height}) ratio {pattern_ratio}"""
         return self._path
 
     def width(self, raw=True):
-	w = self._image.width
+        w = self._image.width
         if not raw:
             w = len(self._bands)
         return w
