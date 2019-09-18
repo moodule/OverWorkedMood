@@ -14,7 +14,9 @@ with open('HISTORY.rst') as history_file:
 requirements = [
     'Click>=7.0',
     'numpy',
-    'Pillow', ]
+    'Pillow',
+    # 'https://github.com/moodule/typical.git@v0.1.1#egg=typical',
+    ]
 
 setup_requirements = [
     'bump2version',
@@ -56,7 +58,7 @@ setup(
     license="MIT license",
     long_description=readme + '\n\n' + history,
     include_package_data=True,
-    keywords='overworked',
+    keywords='upcycling diy blueprint book art',
     name='overworked',
     packages=find_packages(include=['overworked', 'overworked.*']),
     setup_requires=setup_requirements,
