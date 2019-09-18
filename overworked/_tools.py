@@ -1,6 +1,30 @@
+# -*- coding: utf-8 -*-
+
+"""
+================
+Internal Toolbox
+================
+
+Utility functions for the specific purposes of this project.
+"""
+
+from __future__ import division, print_function, absolute_import
+
 import os
 
-def full_path_to_file(name, path='', extension='', prefix='', suffix=''):
+from typical import checks
+
+###############################################################################
+# PATH & FILE MANIPULATIONS
+###############################################################################
+
+@checks
+def full_path_to_file(
+        name,
+        path='',
+        extension='',
+        prefix='',
+        suffix=''):
     """Piece together the full path of a file.
 
     The extension and path shouldn't appear in the string argument name.
