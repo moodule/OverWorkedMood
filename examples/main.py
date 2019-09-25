@@ -1,6 +1,5 @@
 import overworked.pattern as pattern
 import overworked.book as book
-from PIL import Image
 
 # TODO describe the workflow :
 #   find an appropriate image 
