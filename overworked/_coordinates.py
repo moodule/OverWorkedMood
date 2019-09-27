@@ -25,19 +25,17 @@ def aspect_ratio(
         width: numeric,
         height: numeric) -> numeric:
     """
-    Calculates the aspect ratio of an image or a pattern.
-
     Parameters
     ----------
-    width:
+    width: numeric :
         The width of the image in pixels.
         Or the width of the pattern as a slice count.
-    height:
+    height: numeric :
         The height of the image / pattern in pixels.
 
     Returns
     -------
-        The aspect ratio of the image or pattern.
+        The aspect ratio of an image or a pattern.
     """
     return float(width) / float(height)
 
@@ -47,20 +45,19 @@ def coordinate_ratio(
         dimension: numeric,
         reverse: bool=True) -> numeric:
     """
-    Calculates the relative position of a pixel.
-
     Parameters
     ----------
-    coordinate:
+    coordinate: numeric :
         The position as a pixel count.
-    dimension:
+    dimension: numeric :
         The size of the object as a pixel count.
-    reverse:
+    reverse: bool :
+        (Default value = True)
         Whether to count from the lower or upper bound.
 
     Returns
     -------
-        The position as a ratio.
+        The relative position of a pixel.
     """
     __r =  min(
         1.0,
@@ -75,8 +72,42 @@ def coordinate_ratio(
 @checks
 def arc_length(
         radius: numeric,
-        angle: numeric=math.pi):
+        angle: numeric=math.pi) -> numeric:
+    """
+    Parameters
+    ----------
+    radius: numeric :
+        The radius of the arc.
+    angle: numeric :
+        The arc opening angle.
+
+    Returns
+    -------
+        The arc length.
+    """
     return radius * angle
+
+#####################################################################
+# PATTERN
+#####################################################################
+
+@checks
+def range_length(
+        lower: numeric,
+        upper: numeric) -> numeric:
+    """
+    Parameters
+    ----------
+    lower: numeric :
+        The lower.bound of the range.
+    upper: numeric :
+        The upper bound of the range.
+
+    Returns
+    -------
+        The length of the range.
+    """
+    return math.abs(upper - lower)
 
 #####################################################################
 # BOOK
@@ -87,6 +118,22 @@ def _available_sheet_count(
         last_page: int,
         first_page: int=1,
         margin: int=0) -> int:  # the actual number of pages used in the pattern
+    """
+    Parameters
+    ----------
+    last_page: int:
+        The number of the last page in the book.
+    first_page: int:
+        (Default value = 1)
+        The number of the first page in the book.
+    margin: numeric:
+        (Default value = 0)
+        The number of book sheet before and after the pattern.
+
+    Returns
+    -------
+        The number of book sheet available for folding.
+    """
     return max(
         0,
         (
@@ -95,19 +142,53 @@ def _available_sheet_count(
 
 @checks
 def _available_sheet_height(
-        height: float,
-        margin: float=0.0) -> float:
-    return round(
-        max(
-            0.0,
-            height - 2.0 * margin),
-        3)
+        height: numeric,
+        margin: numeric=0.0,
+        as_ratio: bool=False) -> numeric:
+    """
+    Parameters
+    ----------
+    height: numeric:
+        The total height of a book sheet.
+    margin: numeric:
+        (Default value = 0.0)
+        The vertical space before and after the pattern.
+    as_ratio: bool:
+        (Default value = False)
+        Whether to represent the output as a metric length or a ratio.
+
+    Returns
+    -------
+        The vertical portion of the page available for the pattern.
+    """
+    __available = max(
+        0.0,
+        height - 2.0 * margin)
+    if as_ratio:
+        __available = __available / float(height)
+    return round(__available, 3)
 
 @checks
 def sheet_ordinate(
         ratio: numeric,
         height: numeric,
         margin: numeric=0.0) -> numeric:
+    """
+    Parameters
+    ----------
+    ratio: numeric:
+        The vertical position as a ratio..
+    height: numeric:
+        The total height of a book sheet.
+    margin: numeric:
+        (Default value = 0.0)
+        The vertical space before and after the pattern.
+
+    Returns
+    -------
+        The vertical position as a metric length from the bottom.
+    """
     return margin + ratio * _available_sheet_height(
     	height=height,
-    	margin=margin)
+    	margin=margin,
+        as_ratio=False)
