@@ -2,7 +2,7 @@
 
 """
 ================
-Internal Toolbox
+Image Processing
 ================
 
 Utility functions for the specific purposes of this project.
@@ -12,11 +12,19 @@ from __future__ import division, print_function, absolute_import
 
 import os
 
-from typical import checks
+import numpy as np
+from PIL import Image, ImageOps
+
+from typical import checks, iterable, numeric
 
 ###############################################################################
-# PATH & FILE MANIPULATIONS
+# IO
 ###############################################################################
+
+# Image.show()
+# Image.save(
+#     fp='path',
+#     format='png')
 
 @checks
 def full_path_to_file(
@@ -73,95 +81,87 @@ def full_path_to_file(
 #####################################################################
 
 @checks
-def _fill_background(
-        image: Image.Image) -> Image.Image:
+def convert_alpha_to_color(
+        image: Image.Image,
+        color: tuple=(255, 255, 255)) -> Image.Image:
     """
-    Paints the background of an image in white.
+    Paints the transparent background of an image in a given color.
 
     Parameters
     ----------
     image:
         An image object, opened with PIL.
+    color:
+        The replacement color for the alpha channel.
 
     Returns
     -------
-        Another image object, with a white BG.
+        Another image object, with a colored BG.
 
     Raises
     ------
     """
     if image.mode == 'RGBA':
-        image.load()
-        temp = np.array(image)
-        mask = (temp[:,:,3] == 0)
-        temp[:,:,:4][mask] = [255, 255, 255, 255]
-        return Image.fromarray(temp)
+        return Image.alpha_composite(
+            Image.new('RGBA', image.size, color),
+            image)
+    else:
+        return image
 
 @checks
-def _transform_black_white(
+def emphasize(
         image: Image.Image) -> Image.Image:
-    """
-    Represent the image in B&W color scale.
+    __temp = np.array(image)
+    __min_level = np.amin(__temp)
+    __max_level = np.amax(__temp)
+    return image.point(lambda x: 255. * (x - __min_level) / (__max_level - __min_level))
     
-    Parameters
-    ----------
-    image:
-        A PIL image object.
+@checks
+def convert_color_to_binary(
+        image: Image.Image,
+        threshold: numeric=85) -> Image.Image:
+    return image.point(lambda x: 0 if x<threshold else 255, '1')
 
-    Returns
-    -------
-        A new image object, in B&W.
-
-    Raises
-    ------
-    """
-    return image.convert("L")
-
-def _emphasize_image(self):
-    temp = np.array(self._image)
-    min_level = np.amin(temp)
-    max_level = np.amax(temp)
-    if max_level > min_level:
-        self._image = self._image.point(lambda x: 255. * (x - min_level) / (max_level - min_level))
-    
-def _transform_binary(self):
-    self._image = self._image.point(lambda x: 0 if x<85 else 255, '1')
-
-def _crop_image(self):
-    temp = np.invert(np.array(self._image))
-    is_image_empty = np.sum(temp)
-    is_image_empty = is_image_empty == 0.0
+@checks
+def crop_empty_spaces(
+        image: Image.Image) -> Image.Image:
+    __temp = np.invert(np.array(image))
+    is_image_empty = np.sum(__temp) == 0.0
     
     if not is_image_empty:
-        x_array = np.sum(temp, axis=1)
-        x_array = np.transpose(np.nonzero(x_array))
+        __x_array = np.sum(__temp, axis=1)
+        __x_array = np.transpose(np.nonzero(__x_array))
 
-        y_array = np.sum(temp, axis=0)
-        y_array = np.transpose(np.nonzero(y_array))
+        __y_array = np.sum(__temp, axis=0)
+        __y_array = np.transpose(np.nonzero(__y_array))
 
-        min_x = x_array[0]
-        max_x = x_array[::-1][0]
+        __min_x = __x_array[0]
+        __max_x = __x_array[-1]
 
-        min_y = y_array[0]
-        max_y = y_array[::-1][0]
+        __min_y = __y_array[0]
+        __max_y = __y_array[-1]
     else:
         raise Exception('The provided image is empty !')
     
-    self._image = self._image.crop((min_y, min_x, max_y, max_x))
+    return image.crop((__min_y, __min_x, __max_y, __max_x))
 
-def _smooth_image(self):
+def smooth(
+        image: Image.Image) -> Image.Image:
     pass
 
-def _invert(self):
-    self._image = self._image.convert('L')
-    self._image = ImageOps.invert(self._image)
-    self._image = self._image.convert('1')
+def invert(
+        image: Image.Image) -> Image.Image:
+    return ImageOps.invert(image.convert('L')).convert('1')
 
-def _fill_image_band(band_index, sheet_width=1):
+def convert_range_to_band(
+        lower: int,
+        upper: int,
+        dimension: int) -> iterable:
     """The sheet is represented by [sheet_width] columns :
     - at the center is the actual paper, a line of 1 pixel
     - the other columns are left blank to represent the spacing of the sheets of paper"""
-    band = self._bands[band_index]
-    x = band_index * sheet_width
-    for y in range(band[0], band[1]):
-        self._pattern_image.putpixel((x,y), False)
+    return np.array(
+        [
+            0 if i>= lower and i<=upper
+            else 1
+            for i in range(dimension)])
