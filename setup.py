@@ -20,6 +20,7 @@ requirements = [
 
 setup_requirements = [
     'bump2version',
+    'pyment',
     'pytest-runner',
     'twine',
     'watchdog',
@@ -29,6 +30,7 @@ setup_requirements = [
 test_requirements = [
     'coverage',
     'flake8',
+    'hypothesis',
     'pytest>=3',
     'tox', ]
 

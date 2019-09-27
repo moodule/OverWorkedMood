@@ -1,8 +1,10 @@
 bump2version==0.5.11
 coverage==4.5.4
 flake8==3.7.8
+hypothesis==4.36.2
 numpy==1.17.2
 pip==19.2.3
+pyment==0.3.3
 pytest==4.6.5
 pytest-runner==5.1
 tox==3.14.0
