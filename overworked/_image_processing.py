@@ -123,35 +123,48 @@ def convert_color_to_binary(
     return image.point(lambda x: 0 if x<threshold else 255, '1')
 
 @checks
+def reduce_color_space(
+        image:Image.Image,
+        colors: int=2) -> Image.Image:
+    """
+    The function convert_color_to_binary should be a specific
+    use case of this function, with colors=2
+    """
+    return image
+
+@checks
 def crop_empty_spaces(
         image: Image.Image) -> Image.Image:
     __temp = np.invert(np.array(image))
     is_image_empty = np.sum(__temp) == 0.0
     
     if not is_image_empty:
-        __x_array = np.sum(__temp, axis=1)
-        __x_array = np.transpose(np.nonzero(__x_array))
+        __x_array = np.array(np.nonzero(np.sum(__temp, axis=1)))
+        __y_array = np.array(np.nonzero(np.sum(__temp, axis=0)))
 
-        __y_array = np.sum(__temp, axis=0)
-        __y_array = np.transpose(np.nonzero(__y_array))
+        __min_x = __x_array.flat[0]
+        __max_x = __x_array.flat[-1]
 
-        __min_x = __x_array[0]
-        __max_x = __x_array[-1]
-
-        __min_y = __y_array[0]
-        __max_y = __y_array[-1]
+        __min_y = __y_array.flat[0]
+        __max_y = __y_array.flat[-1]
     else:
         raise Exception('The provided image is empty !')
     
-    return image.crop((__min_y, __min_x, __max_y, __max_x))
+    return image.crop(box=(__min_x, __min_y, __max_x, __max_y))
 
 def smooth(
         image: Image.Image) -> Image.Image:
-    pass
+    return image
 
 def invert(
-        image: Image.Image) -> Image.Image:
-    return ImageOps.invert(image.convert('L')).convert('1')
+        image: Image.Image,
+        mode: str="pillow") -> Image.Image:
+    if 'pil' in mode.lower():
+        return ImageOps.invert(image.convert('L')).convert('1')
+    else:
+        return Image.fromarray(
+            obj=np.invert(np.array(image)),
+            mode='1')
 
 def convert_range_to_band(
         lower: int,
