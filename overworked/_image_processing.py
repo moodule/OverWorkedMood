@@ -139,8 +139,8 @@ def crop_empty_spaces(
     is_image_empty = np.sum(__temp) == 0.0
     
     if not is_image_empty:
-        __x_array = np.array(np.nonzero(np.sum(__temp, axis=1)))
-        __y_array = np.array(np.nonzero(np.sum(__temp, axis=0)))
+        __x_array = np.array(np.nonzero(np.sum(__temp, axis=0)))
+        __y_array = np.array(np.nonzero(np.sum(__temp, axis=1)))
 
         __min_x = __x_array.flat[0]
         __max_x = __x_array.flat[-1]
