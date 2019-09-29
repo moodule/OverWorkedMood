@@ -6,9 +6,10 @@
 import os
 import pytest
 
+import numpy as np
 from PIL import Image
 
-from overworked import preprocess
+from overworked.folding import preprocess, slice_image
 
 #####################################################################
 # _
@@ -37,7 +38,7 @@ IMAGE_PATHS = {
         'tests/data/binary/github.png']}
 
 #####################################################################
-# END TO END
+# PREPROCESSING
 #####################################################################
 
 def test_preprocess_binary_images():
@@ -50,3 +51,14 @@ def test_preprocess_binary_images():
                     '.processed'.join(os.path.splitext(__path))
                     + '.jpg'),
                 format='JPEG')
+
+#####################################################################
+# SLICING
+#####################################################################
+
+def test_sliced_image_size():
+    for __path in IMAGE_PATHS['binary']:
+        with preprocess(Image.open(__path)) as __image:
+            assert (
+                np.shape(slice_image(__image))[0] # number of ranges
+                <= np.shape(__image)[1]) # width
