@@ -357,10 +357,16 @@ def slice_image(
         for __band in np.array(image).transpose()] # transpose so that second dimension is y
 
 @checks
+def postprocess_pattern(
+        slices: iterable) -> iterable:
+    """
+    """
+    return _filter_pattern_slices(
+        slices=_flatten_pattern_slices(slices=slices),
+        threshold=0.05)
+
+@checks
 def map_folding_pattern_to_book(wanted_width=None):
-    _filter_bands()
-    _even_slice_spacing(wanted_width)
-    _isolate_bands()
     _generate_pattern_image()
     _check_pattern()
     #save_pattern()
