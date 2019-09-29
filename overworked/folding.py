@@ -7,6 +7,11 @@ Folding Art
 
 Calculate how to fold pages to print an image into the depth of a book.
 
+Jargon:
+- an image band is a 1-pixel wide vertical portion of the image 
+- a pattern slice is a continuous stroke of a single color in an image band
+Each pattern slice is meant to map a book sheet.
+
 It is chosen to match the aspect ratio of the pattern, which is considered fixed.
 To adjust the aspect ratio of the folded pattern, you can play with :
     - the book size (sheet size, number of pages)
@@ -111,11 +116,7 @@ def is_black(
 # SLICE THE IMAGE
 #####################################################################
 
-def _count_slice_ranges(
-        slices: iterable):
-    return sum([len(__slice) for __slice in slices])
-
-def _calculate_dropout_factor(
+def _calculate_pattern_slice_dropout_factor(
         original_width: int,
         wanted_width: int):
     """Once evened the pattern has roughly the same width as the original image.
@@ -124,14 +125,14 @@ def _calculate_dropout_factor(
         1,
         math.ceil(float(original_width) / float(wanted_width)))
 
-def _isolate_ranges(
+def _flatten_pattern_slices(
         slices):
     return [
         __band for __band in __slice
         for __slice in slices]
 
 @checks
-def _filter_ranges(
+def _filter_pattern_slices(
         ranges: iterable,
         threshold: float=0.05) -> iterable:
     """
@@ -143,7 +144,7 @@ def _filter_ranges(
         for __range in ranges]
 
 @checks
-def _image_band_to_slice(
+def _image_band_to_pattern_slice(
         band: iterable) -> iterable:
     """
     Works only on binary images: there's no color information in the output
@@ -178,6 +179,90 @@ def _image_band_to_slice(
         __slice.append((0.0, 0.0)) # white page / slice / image band
 
     return __slice
+
+#####################################################################
+# VIEWING & EXPORTING
+#####################################################################
+
+@checks
+def _pattern_range_to_image_band(
+        range_: tuple,
+        spacing: int=1) -> list:
+    """
+    The sheet is represented by [sheet_width] columns :
+    - at the center is the actual paper, a line of 1 pixel
+    - the other columns are left blank to represent the spacing of the sheets of paper"""
+    band = _bands[band_index]
+    x = (spacing + 1) * index
+    for y in range(band[0], band[1]):
+        _pattern_image.putpixel((x,y), False)
+
+@checks
+def export_pattern_preview_image(
+        ranges: iterable,
+        spacing: int=1):
+    """
+    """
+    __width = spacing * (len(bands) + 1) + len(bands)
+    __height = image.height
+
+    __image = Image.new('1', (pattern_image_width, height(raw=True)), True)
+    for i in xrange(width(raw=False)):
+        _fill_image_band(bands, i, spacing)
+    return Image.fromarray(
+        obj=bands,
+        mode='1')
+
+def _band_to_folding_marks_line_str(index, band):
+    folding_marks_line = ''
+    current_page = _first_page + 2 * _horizontal_margin + 2 * index
+    lower_mark = 100.0 * _pixel_to_sheet_coordinate(band[1])
+    upper_mark = 100.0 * _pixel_to_sheet_coordinate(band[0])
+    if _pattern.is_white(band):
+        lower_mark = 0.0
+        upper_mark = 100.0 * _sheet_height
+        folding_marks_line = FOLDING_TABLE_BLANK_LINE.format(
+                page=current_page,
+                lower=lower_mark,
+                upper=upper_mark)
+    elif _pattern.is_black(band):
+        if not _vertical_margin:
+            folding_marks_line = FOLDING_TABLE_BLACK_LINE.format(
+                    page = current_page,
+                    lower = '-',
+                    upper = '-')
+    else:
+        folding_marks_line = FOLDING_TABLE_FOLDED_LINE.format(
+                page=current_page,
+                lower=lower_mark,
+                upper=upper_mark)
+    return folding_marks_line
+
+def save_folding_table(pattern_name='', pattern_path=''):
+    saving_path = _tools.full_path_to_file(
+            name=name() if not pattern_name else pattern_name,
+            path='./' if not pattern_path else pattern_path,
+            extension='txt')
+
+    with open(saving_path, 'w') as pattern_file:
+   
+        folding_table = FOLDING_TABLE_DISCLAIMER.format(
+            pattern_name='= ' + _pattern.name() + ' ')
+        
+        folding_table += FOLDING_TABLE_HEADER.format(
+            page='Page',
+            lower_mark='Lower',
+            upper_mark='upper')
+
+        if _pattern is not None:
+            for i, band in enumerate(_pattern._bands):
+                folding_table += _band_to_folding_marks_line_str(i, band)
+
+        folding_table += FOLDING_TABLE_FOOTER
+
+        pattern_file.write(folding_table)
+        pattern_file.close()
+        print('Your pattern has been saved to {file_path}.'.format(file_path=saving_path))
 
 ###############################################################################
 # MAP THE IMAGE TO THE BOOK
