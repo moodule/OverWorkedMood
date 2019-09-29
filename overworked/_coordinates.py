@@ -40,7 +40,7 @@ def aspect_ratio(
     return float(width) / float(height)
 
 @checks
-def coordinate_ratio(
+def coordinate_to_ratio(
         coordinate: numeric,
         dimension: numeric,
         reverse: bool=False) -> numeric:
@@ -68,6 +68,28 @@ def coordinate_ratio(
         return 1.0 - __r
     else:
         return __r
+
+@checks
+def ratio_to_coordinate(
+        ratio: numeric,
+        height: int,
+        reverse: bool=False) -> int:
+    """
+    Parameters
+    ----------
+    coordinate: numeric :
+        The position as a pixel count.
+    dimension: numeric :
+        The size of the object as a pixel count.
+    reverse: bool :
+        (Default value = True)
+        Whether to count from the lower or upper bound.
+
+    Returns
+    -------
+        The relative position of a pixel.
+    """
+    return math.floor(ratio * float(height))
 
 @checks
 def arc_length(
@@ -114,7 +136,7 @@ def range_length(
 #####################################################################
 
 @checks
-def _available_sheet_count(
+def available_sheet_count(
         last_page: int,
         first_page: int=1,
         margin: int=0) -> int:  # the actual number of pages used in the pattern
@@ -141,7 +163,7 @@ def _available_sheet_count(
              - 2 * margin))
 
 @checks
-def _available_sheet_height(
+def available_sheet_height(
         height: numeric,
         margin: numeric=0.0,
         as_ratio: bool=False) -> numeric:
@@ -166,6 +188,7 @@ def _available_sheet_height(
         height - 2.0 * margin)
     if as_ratio:
         __available = __available / float(height)
+    
     return round(__available, 3)
 
 @checks
@@ -188,7 +211,7 @@ def sheet_ordinate(
     -------
         The vertical position as a metric length from the bottom.
     """
-    return margin + ratio * _available_sheet_height(
+    return margin + ratio * available_sheet_height(
     	height=height,
     	margin=margin,
         as_ratio=False)
