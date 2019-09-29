@@ -43,7 +43,7 @@ def aspect_ratio(
 def coordinate_ratio(
         coordinate: numeric,
         dimension: numeric,
-        reverse: bool=True) -> numeric:
+        reverse: bool=False) -> numeric:
     """
     Parameters
     ----------
