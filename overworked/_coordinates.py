@@ -188,7 +188,7 @@ def available_sheet_height(
         height - 2.0 * margin)
     if as_ratio:
         __available = __available / float(height)
-    
+
     return round(__available, 3)
 
 @checks
@@ -200,7 +200,7 @@ def sheet_ordinate(
     Parameters
     ----------
     ratio: numeric:
-        The vertical position as a ratio..
+        The vertical position as a ratio.
     height: numeric:
         The total height of a book sheet.
     margin: numeric:
@@ -215,3 +215,24 @@ def sheet_ordinate(
     	height=height,
     	margin=margin,
         as_ratio=False)
+
+@checks
+def sheet_page(
+        index: int,
+        first_page: int=1,
+        margin: int=0,
+        relative: bool=True) -> int:
+    """
+    Parameters
+    ----------
+    index: int:
+        The relative sheet index, within the available space (margin discounted).
+    margin: int:
+        (Default value = 0)
+        The number of book sheet reserved before and after the pattern.
+
+    Returns
+    -------
+        The absolute page number of the book sheet.
+    """
+    return first_page + relative * 2 * margin + 2 * index
