@@ -101,6 +101,17 @@ def is_white(
         upper: numeric) -> bool:
     """
     Says whether a pattern band is blank.
+
+    Parameters
+    ----------
+    lower: numeric :
+        
+    upper: numeric :
+        
+
+    Returns
+    -------
+
     """
     return (lower >= upper)
 
@@ -110,6 +121,17 @@ def is_black(
         upper: numeric) -> bool:
     """
     Says whether a pattern band is black.
+
+    Parameters
+    ----------
+    lower: numeric :
+        
+    upper: numeric :
+        
+
+    Returns
+    -------
+
     """
     return (
         lower <= 0.0
@@ -125,6 +147,15 @@ def _image_band_to_pattern_slice(
     """
     Works only on binary images: there's no color information in the output
     ranges. The folding ranges are always black in this case.
+
+    Parameters
+    ----------
+    band: iterable :
+        
+
+    Returns
+    -------
+
     """
     __slice = []
     __height = np.size(band)
@@ -161,6 +192,15 @@ def _flatten_pattern_slices(
         slices: iterable) -> iterable:
     """
     One range per sheet of paper.
+
+    Parameters
+    ----------
+    slices: iterable :
+        
+
+    Returns
+    -------
+
     """
     return [
         __band for __band in __slice
@@ -173,6 +213,17 @@ def _filter_pattern_slices(
     """
     Filter out the small slices: they make the pattern wider and don't render
     well as folded pages.
+
+    Parameters
+    ----------
+    slices: iterable :
+        
+    threshold: float :
+         (Default value = 0.05)
+
+    Returns
+    -------
+
     """
     return [
         (0.0, 0.0) if range_length(__slice[0], __slice[1]) < threshold
@@ -187,24 +238,40 @@ def _filter_pattern_slices(
 def _calculate_pattern_slice_dropout_factor(
         original_width: int,
         wanted_width: int) -> int:
-    """Once evened the pattern has roughly the same width as the original image.
-    Number of bands ~= number of slices = image width"""
+    """
+    Once evened the pattern has roughly the same width as the original image.
+    Number of bands ~= number of slices = image width
+
+    Parameters
+    ----------
+    original_width: int :
+        
+    wanted_width: int :
+        
+
+    Returns
+    -------
+
+    """
     return max(
         1,
         math.ceil(float(original_width) / float(wanted_width)))
 
 def _calculate_margins():
+    """ """
     _calculate_horizontal_margin()
     _calculate_book_opening()
     _calculate_vertical_margin()
 
 def _calculate_horizontal_margin():
+    """ """
     _horizontal_margin = 0
     if _pattern is not None:
         _horizontal_margin = sheet_count()[3] - _pattern.width(raw=False)
         _horizontal_margin = max(0, _horizontal_margin) // 2
 
 def _calculate_book_opening():
+    """ """
     _book_opening = 180
     if _pattern is not None:
         pattern_width_360 = sheet_spacing()[2] * float(sheet_count()[1])
@@ -218,6 +285,7 @@ def _calculate_book_opening():
             _book_opening = 90
 
 def _calculate_vertical_margin():
+    """ """
     _vertical_margin = 0.0
     if _pattern is not None:
         pattern_width_360 = sheet_spacing()[2] * float(sheet_count()[1])
@@ -241,6 +309,18 @@ def _pattern_slice_to_image_band(
         slice_: tuple,
         height: int) -> list:
     """
+    
+
+    Parameters
+    ----------
+    slice_: tuple :
+        
+    height: int :
+        
+
+    Returns
+    -------
+
     """
     __band = True * np.ones((height,))
     for __y in range(
@@ -256,6 +336,24 @@ def _pattern_slice_to_folding_marks(
         sheet_height: numeric,
         sheet_margin: numeric,
         slice_: iterable) -> str:
+    """
+    
+
+    Parameters
+    ----------
+    page: int :
+        
+    sheet_height: numeric :
+        
+    sheet_margin: numeric :
+        
+    slice_: iterable :
+        
+
+    Returns
+    -------
+
+    """
     __message = ''
     if is_black(lower=slice_[0], upper=slice_[1]):
         __message = BLACK_LINE_WARNING
@@ -283,9 +381,22 @@ def generate_pattern_preview_image(
     The sheet is surrounded by [spacing] columns :
     - at the center is the actual paper, a line of 1 pixel
     - the surrounding columns are white
-
+    
     It's meant to represent the spacing of the sheets of paper,
     when the book is opened.
+
+    Parameters
+    ----------
+    slices: iterable :
+        
+    height: int :
+        
+    spacing: int :
+         (Default value = 1)
+
+    Returns
+    -------
+
     """
     __bands = True * np.ones((
         spacing * (len(slices) + 1) + len(slices),
@@ -309,6 +420,26 @@ def generate_folding_table(
         vertical_margin: numeric,        
         slices: iterable,) -> str:
     """
+    
+
+    Parameters
+    ----------
+    name: str :
+        
+    first_page: int :
+        
+    sheet_height: int :
+        
+    horizontal_margin: int :
+        
+    vertical_margin: numeric :
+        
+    slices: iterable :
+        
+
+    Returns
+    -------
+
     """
     __folding_table = FOLDING_TABLE_DISCLAIMER.format(
         name='= ' + name + ' ')
@@ -341,6 +472,22 @@ def preprocess_image(
         image: Image.Image,
         colors: int=2,
         invert: bool=False) -> Image.Image:
+    """
+    
+
+    Parameters
+    ----------
+    image: Image.Image :
+        
+    colors: int :
+         (Default value = 2)
+    invert: bool :
+         (Default value = False)
+
+    Returns
+    -------
+
+    """
     __temp = convert_color_to_binary(emphasize(
         convert_alpha_to_color(image).convert('L')))
     
@@ -352,6 +499,18 @@ def preprocess_image(
 @checks
 def slice_image(
         image: Image.Image) -> iterable:
+    """
+    
+
+    Parameters
+    ----------
+    image: Image.Image :
+        
+
+    Returns
+    -------
+
+    """
     return [
         _image_band_to_pattern_slice(__band)
         for __band in np.array(image).transpose()] # transpose so that second dimension is y
@@ -360,6 +519,16 @@ def slice_image(
 def postprocess_pattern(
         slices: iterable) -> iterable:
     """
+    
+
+    Parameters
+    ----------
+    slices: iterable :
+        
+
+    Returns
+    -------
+
     """
     return _filter_pattern_slices(
         slices=_flatten_pattern_slices(slices=slices),
@@ -367,6 +536,18 @@ def postprocess_pattern(
 
 @checks
 def map_folding_pattern_to_book(wanted_width=None):
+    """
+    
+
+    Parameters
+    ----------
+    wanted_width :
+         (Default value = None)
+
+    Returns
+    -------
+
+    """
     _generate_pattern_image()
     _check_pattern()
     #save_pattern()
