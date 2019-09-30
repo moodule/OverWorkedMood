@@ -10,9 +10,10 @@ import numpy as np
 from PIL import Image
 
 from overworked._image_processing import (
-    preprocess_image)
+    preprocess_image,)
 from overworked.folding import (
-    slice_image)
+    slice_image,
+    postprocess_folding_pattern)
 
 #####################################################################
 # _
@@ -41,12 +42,5 @@ IMAGE_PATHS = {
         'tests/data/binary/github.png']}
 
 #####################################################################
-# SLICING
+# 
 #####################################################################
-
-def test_sliced_image_size():
-    for __path in IMAGE_PATHS['binary']:
-        with preprocess_image(Image.open(__path)) as __image:
-            assert (
-                np.shape(slice_image(__image))[0] # number of ranges
-                <= np.shape(__image)[1]) # width

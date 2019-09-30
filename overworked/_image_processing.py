@@ -17,6 +17,9 @@ from PIL import Image, ImageOps
 
 from typical import checks, iterable, numeric
 
+from overworked._coordinates import (
+    ratio_to_coordinate)
+
 ###############################################################################
 # IO
 ###############################################################################
@@ -77,7 +80,7 @@ def full_path_to_file(
     return file_path
 
 #####################################################################
-# IMAGE PROCESSING
+# COLOR SPACE
 #####################################################################
 
 @checks
@@ -107,14 +110,6 @@ def convert_alpha_to_color(
             image)
     else:
         return image
-
-@checks
-def emphasize(
-        image: Image.Image) -> Image.Image:
-    __temp = np.array(image)
-    __min_level = np.amin(__temp)
-    __max_level = np.amax(__temp)
-    return image.point(lambda x: 255. * (x - __min_level) / (__max_level - __min_level))
     
 @checks
 def convert_color_to_binary(
@@ -131,6 +126,20 @@ def reduce_color_space(
     use case of this function, with colors=2
     """
     return image
+
+def invert(
+        image: Image.Image,
+        mode: str="pillow") -> Image.Image:
+    if 'pil' in mode.lower():
+        return ImageOps.invert(image.convert('L')).convert('1')
+    else:
+        return Image.fromarray(
+            obj=np.invert(np.array(image)),
+            mode='1')
+
+#####################################################################
+# IMAGE DIMENSION
+#####################################################################
 
 @checks
 def crop_empty_spaces(
@@ -152,21 +161,28 @@ def crop_empty_spaces(
     
     return image.crop(box=(__min_x, __min_y, __max_x, __max_y))
 
+#####################################################################
+# FILTERS
+#####################################################################
+
+@checks
+def emphasize(
+        image: Image.Image) -> Image.Image:
+    __temp = np.array(image)
+    __min_level = np.amin(__temp)
+    __max_level = np.amax(__temp)
+    return image.point(lambda x: 255. * (x - __min_level) / (__max_level - __min_level))
+
 def smooth(
         image: Image.Image) -> Image.Image:
     return image
 
-def invert(
-        image: Image.Image,
-        mode: str="pillow") -> Image.Image:
-    if 'pil' in mode.lower():
-        return ImageOps.invert(image.convert('L')).convert('1')
-    else:
-        return Image.fromarray(
-            obj=np.invert(np.array(image)),
-            mode='1')
+#####################################################################
+# PATTERN TO IMAGE
+#####################################################################
 
-def convert_range_to_band(
+@checks
+def _convert_pixel_range_to_image_band(
         lower: int,
         upper: int,
         dimension: int) -> iterable:
@@ -175,6 +191,100 @@ def convert_range_to_band(
     - the other columns are left blank to represent the spacing of the sheets of paper"""
     return np.array(
         [
-            0 if i>= lower and i<=upper
-            else 1
+            0 if i>= lower and i<=upper # black pixels
+            else 1 # white pixels
             for i in range(dimension)])
+
+@checks
+def _convert_pattern_slice_to_image_band(
+        slice_: tuple,
+        height: int) -> iterable:
+    """
+    
+
+    Parameters
+    ----------
+    slice_: tuple :
+        
+    height: int :
+        
+
+    Returns
+    -------
+
+    """
+    return _convert_pixel_range_to_image_band(
+        lower=ratio_to_coordinate(slice_[0], height, reverse=False),
+        upper=ratio_to_coordinate(slice_[1], height, reverse=False),
+        dimension=height)
+
+@checks
+def generate_folding_pattern_preview_image(
+        slices: iterable,
+        height: int,
+        spacing: int=1) -> Image.Image:
+    """
+    The sheet is surrounded by [spacing] columns :
+    - at the center is the actual paper, a line of 1 pixel
+    - the surrounding columns are white
+    
+    It's meant to represent the spacing of the sheets of paper,
+    when the book is opened.
+
+    Parameters
+    ----------
+    slices: iterable :
+        
+    height: int :
+        
+    spacing: int :
+         (Default value = 1)
+
+    Returns
+    -------
+
+    """
+    __width = (
+        spacing * (len(slices) + 1) # white spacing
+        + len(slices)) # b & w slice
+
+    return Image.fromarray(
+        obj=np.array([
+            _convert_pattern_slice_to_image_band(
+                slice_=__slice,
+                height=height)
+            for __slice in slices]).transpose(),
+        mode='1')
+
+###############################################################################
+# END TO END WORKFLOW
+###############################################################################
+
+@checks
+def preprocess_image(
+        image: Image.Image,
+        colors: int=2,
+        invert: bool=False) -> Image.Image:
+    """
+    
+
+    Parameters
+    ----------
+    image: Image.Image :
+        
+    colors: int :
+         (Default value = 2)
+    invert: bool :
+         (Default value = False)
+
+    Returns
+    -------
+
+    """
+    __temp = convert_color_to_binary(emphasize(
+        convert_alpha_to_color(image).convert('L')))
+    
+    if invert:
+        return smooth(crop_empty_spaces(invert(__temp)))
+    else:
+        return smooth(crop_empty_spaces(__temp))

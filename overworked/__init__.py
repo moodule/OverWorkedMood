@@ -14,11 +14,15 @@ Examples
 
 from __future__ import division, print_function, absolute_import
 
+from overworked._image_processing import (
+	generate_folding_pattern_preview_image,
+	preprocess_image,)
+from overworked._io import (
+	generate_folding_table,)
 from overworked.folding import (
-	preprocess_image,
-	slice_image_into_pattern,
+	map_folding_pattern_to_book,
 	postprocess_folding_pattern,
-	export_folding_pattern)
+	slice_image)
 
 __author__ = 'David Mougeolle'
 __email__ = 'moodule@protonmail.com'
@@ -29,7 +33,9 @@ __url__ = 'http://github/moodule/overworked'
 __license__ = 'MIT license'
 
 __all__ = [
-	'preprocess_image',
-	'slice_image_into_folding_pattern',
+	'generate_folding_pattern_preview_image',
+	'generate_folding_table',
+	'map_folding_pattern_to_book',
 	'postprocess_folding_pattern',
-	'export_folding_pattern' ]
+	'preprocess_image',
+	'slice_image',]
