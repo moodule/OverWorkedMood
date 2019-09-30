@@ -129,7 +129,7 @@ def range_length(
     -------
         The length of the range.
     """
-    return math.abs(upper - lower)
+    return abs(upper - lower)
 
 #####################################################################
 # BOOK
