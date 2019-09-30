@@ -9,7 +9,7 @@ import pytest
 import numpy as np
 from PIL import Image
 
-from overworked.folding import preprocess, slice_image
+from overworked.folding import preprocess_image, slice_image
 
 #####################################################################
 # _
@@ -44,7 +44,7 @@ IMAGE_PATHS = {
 def test_preprocess_binary_images():
     for __path in IMAGE_PATHS['binary']:
         with Image.open(__path) as __image:
-            preprocess(
+            preprocess_image(
                 image=__image,
                 invert=False).save(
                 fp=(
@@ -58,7 +58,7 @@ def test_preprocess_binary_images():
 
 def test_sliced_image_size():
     for __path in IMAGE_PATHS['binary']:
-        with preprocess(Image.open(__path)) as __image:
+        with preprocess_image(Image.open(__path)) as __image:
             assert (
                 np.shape(slice_image(__image))[0] # number of ranges
                 <= np.shape(__image)[1]) # width

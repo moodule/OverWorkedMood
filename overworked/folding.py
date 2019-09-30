@@ -203,8 +203,9 @@ def _flatten_pattern_slices(
 
     """
     return [
-        __band for __band in __slice
-        for __slice in slices]
+        __band
+        for __slice in slices
+        for __band in __slice]
 
 @checks
 def _filter_pattern_slices(
@@ -307,7 +308,7 @@ def _calculate_vertical_margin():
 @checks
 def _pattern_slice_to_image_band(
         slice_: tuple,
-        height: int) -> list:
+        height: int) -> iterable:
     """
     
 
@@ -373,7 +374,7 @@ def _pattern_slice_to_folding_marks(
         message=__message)
 
 @checks
-def generate_pattern_preview_image(
+def generate_folding_pattern_preview_image(
         slices: iterable,
         height: int,
         spacing: int=1) -> Image.Image:
@@ -516,7 +517,7 @@ def slice_image(
         for __band in np.array(image).transpose()] # transpose so that second dimension is y
 
 @checks
-def postprocess_pattern(
+def postprocess_folding_pattern(
         slices: iterable) -> iterable:
     """
     
