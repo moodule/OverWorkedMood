@@ -16,7 +16,7 @@ tox = "==3.14.0"
 twine = "==1.14.0"
 watchdog = "==0.9.0"
 click = "==7.0"
-Pillow = "==6.1.0"
+Pillow = "==6.2.0"
 Sphinx = "==1.8.5"
 typical = {editable = true,git = "https://github.com/moodule/typical.git",ref = "v0.1.1"}
 hypothesis = "==4.36.2"
