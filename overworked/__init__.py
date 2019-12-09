@@ -29,7 +29,7 @@ __email__ = 'moodule@protonmail.com'
 __version__ = '0.6.2'
 __title__ = 'overworked'
 __description__ = 'Generate blueprints to upcycle old items into art.'
-__url__ = 'http://github/moodule/overworked'
+__url__ = 'https://github/moodule/overworked'
 __license__ = 'MIT license'
 
 __all__ = [
