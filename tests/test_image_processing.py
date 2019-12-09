@@ -29,7 +29,7 @@ def test_invert_self_reversible(binary_images):
 # PREPROCESSING
 #####################################################################
 
-def test_preprocess_binary_imagess(binary_images):
+def test_preprocess_binary_images(binary_images):
     for __image in binary_images:
         preprocess_image(
             image=__image,
